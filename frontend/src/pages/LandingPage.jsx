@@ -8,6 +8,7 @@ import WhyGigBro from "../components/WhyGigBro.jsx"
 import CTA from "../components/CTA.jsx"
 import Footer from "../components/Footer.jsx"
 import BackendNotification from "../components/BackendNotification.jsx"
+import Pricing from "./Pricing.jsx"
 
 const LandingPage = () => {
     return (
@@ -19,6 +20,7 @@ const LandingPage = () => {
             <HowItWorks/>
             <Analysis/>
             <Faq/>
+            <Pricing/>
             <WhyGigBro/>
             <CTA/>
             <Footer/>
