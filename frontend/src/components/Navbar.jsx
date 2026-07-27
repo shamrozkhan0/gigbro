@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Menu, X, Sparkles} from "lucide-react";
+import { Menu, X, Sparkles } from "lucide-react";
 import { Link } from "react-router-dom";
 
 const NAV_LINKS = [
@@ -45,31 +45,31 @@ export default function Navbar() {
 
 
   useEffect(() => {
-  async function checkIsLogin() {
-    try {
-      const response = await fetch(
-        `${import.meta.env.VITE_BACKEND_URL}me`,
-        {
-          method: "GET",
-          credentials: "include",
-        }
-      );
+    async function checkIsLogin() {
+      try {
+        const response = await fetch(
+          `${import.meta.env.VITE_BACKEND_URL}me`,
+          {
+            method: "GET",
+            credentials: "include",
+          }
+        );
 
-      console.log("Status:", response.status);
+        console.log("Status:", response.status);
 
-      const data = await response.json();
+        const data = await response.json();
 
-      console.log("ME RESPONSE:", data);
+        console.log("ME RESPONSE:", data);
 
-      setIsLogin(data.success);
-    } catch (error) {
-      console.error("Check login error:", error);
-      setIsLogin(false);
+        setIsLogin(data.success);
+      } catch (error) {
+        console.error("Check login error:", error);
+        setIsLogin(false);
+      }
     }
-  }
 
-  checkIsLogin();
-}, []);
+    checkIsLogin();
+  }, []);
 
   return (
     <header className="w-full px-3 py-4 sm:px-6 fixed z-100">
@@ -101,24 +101,25 @@ export default function Navbar() {
         </ul>
 
         {/* Desktop actions */}
-        {!isLogin ?
-          <div className="hidden items-center gap-3 lg:flex">
-            <Link to="/login" className="rounded-lg border border-slate-200 px-5 py-2 text-[15px] font-medium text-slate-800 transition-colors hover:bg-slate-50">
-              Login
-            </Link>
-            <Link to="/signup" className="flex items-center gap-2 rounded-lg bg-emerald-600 px-5 py-2 text-[15px] font-semibold text-white shadow-sm transition-colors hover:bg-emerald-700">
-              Analyze My Gig Free
-              <Sparkles className="h-4 w-4" />
-            </Link>
-          </div>
-          : <div className="">
+        <div className="hidden items-center gap-3 lg:flex">
+          {!isLogin ?
+            <>
+              <Link to="/login" className="rounded-lg border border-slate-200 px-5 py-2 text-[15px] font-medium text-slate-800 transition-colors hover:bg-slate-50">
+                Login
+              </Link>
+              <Link to="/signup" className="flex items-center gap-2 rounded-lg bg-emerald-600 px-5 py-2 text-[15px] font-semibold text-white shadow-sm transition-colors hover:bg-emerald-700">
+                Analyze My Gig Free
+                <Sparkles className="h-4 w-4" />
+              </Link>
+            </>
+            :
             <Link
-              className="flex items-center gap-2 rounded-lg bg-emerald-600 px-5 py-2 text-[15px] font-semibold text-white shadow-sm transition-colors hover:bg-emerald-700" 
+              className="flex items-center gap-2 rounded-lg bg-emerald-600 px-5 py-2 text-[15px] font-semibold text-white shadow-sm transition-colors hover:bg-emerald-700"
               to="/dashboard">
               Dashboard
             </Link>
-          </div>
-        }
+          }
+        </div>
 
         {/* Mobile toggle */}
         <button
@@ -157,16 +158,23 @@ export default function Navbar() {
           </ul>
 
           <div className="mt-3 flex flex-col gap-2 border-t border-slate-100 pt-3">
-            <Link
-              to="/login"
-              onClick={() => console.log("LOGIN CLICKED")}
-              className="w-full rounded-lg border border-slate-200 px-5 py-2.5 text-[15px] font-medium text-slate-800 transition-colors hover:bg-slate-50">
-              Login
-            </Link>
-            <Link to="/signup" className="flex w-full items-center justify-center gap-2 rounded-lg bg-emerald-600 px-5 py-2.5 text-[15px] font-semibold text-white shadow-sm transition-colors hover:bg-emerald-700">
-              Analyze My Gig Free
-              <Sparkles className="h-4 w-4" />
-            </Link>
+            {!isLogin ?
+              <>
+                <Link to="/login" className="rounded-lg border border-slate-200 px-5 py-2 text-[15px] font-medium text-slate-800 transition-colors hover:bg-slate-50">
+                  Login
+                </Link>
+                <Link to="/signup" className="flex items-center gap-2 rounded-lg bg-emerald-600 px-5 py-2 text-[15px] font-semibold text-white shadow-sm transition-colors hover:bg-emerald-700">
+                  Analyze My Gig Free
+                  <Sparkles className="h-4 w-4" />
+                </Link>
+              </>
+              :
+              <Link
+                className="flex items-center gap-2 rounded-lg bg-emerald-600 px-5 py-2 text-[15px] font-semibold text-white shadow-sm transition-colors hover:bg-emerald-700"
+                to="/dashboard">
+                Dashboard
+              </Link>
+            }
           </div>
         </div>
       )}

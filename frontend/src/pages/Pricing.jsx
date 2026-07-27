@@ -31,9 +31,7 @@ const Pricing = () => {
            bg-gradient-to-br from-green-500 via-green-600 to-green-800 p-10 text-white shadow-2xl">
           {/* Top Section */}
           <div className="flex items-start justify-between">
-            {/* <div className="flex h-14 w-14 items-center justify-center rounded-full border-[6px] border-white">
-                <span className="text-3xl font-black">G</span>
-              </div> */}
+    
 
             <div>
               <h3 className="text-4xl font-extrabold tracking-tight">
@@ -65,10 +63,7 @@ const Pricing = () => {
 
           {/* Main Content */}
           <div className="mt-10">
-            {/* <h4 className="text-xl font-bold tracking-tight">
-              Buddy
-            </h4> */}
-
+       
             <p className="mt-2 text-md text-white/80">
               For sellers getting started
             </p>
@@ -107,11 +102,6 @@ const Pricing = () => {
           {/* Top Section */}
           <div className="flex items-start justify-between">
             <div className="flex items-center gap-4">
-              {/* <div className="flex h-14 w-14 items-center justify-center rounded-full border-[6px] border-green-500">
-                <span className="text-3xl font-black text-green-500">
-                  G
-                </span>
-              </div> */}
 
               <div>
                 <h3 className="text-4xl font-bold tracking-tight">
@@ -140,12 +130,7 @@ const Pricing = () => {
             />
           </div>
 
-          {/* Main Content */}
           <div className="mt-10">
-            {/* <h4 className="text-2xl font-bold tracking-tight">
-              <span className="text-green-500">Pro</span>{" "}
-              Buddy
-            </h4> */}
 
             <p className="mt-4 text-md text-white/80">
               For serious sellers <br className="block sm:hidden"/> who want to rank higher
