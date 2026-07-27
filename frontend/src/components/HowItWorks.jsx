@@ -148,7 +148,7 @@ function StatItem({ icon: Icon, title, lines }) {
 
 export default function HowItWorks() {
   return (
-    <section className="w-full bg-white px-4 py-16 sm:px-6 sm:py-20 lg:px-8">
+    <section className="w-full bg-white px-4 py-16 sm:px-6 sm:py-20 lg:px-8" id="how-it-works">
       <div className="mx-auto max-w-7xl">
         {/* Header */}
         <div className="mx-auto max-w-3xl text-center">
@@ -157,7 +157,7 @@ export default function HowItWorks() {
             HOW GIGBRO WORKS
           </span>
 
-          <h2 className="mt-6 text-3xl font-bold leading-tight tracking-tight text-slate-900 sm:text-4xl lg:text-5xl">
+          <h2 className="mt-6 text-3xl font-bold leading-tight tracking-tight text-slate-900 sm:text-4xl lg:text-4xl">
             Analyze Your Gig. Get Clear Insights.
             <br />
             <span className="text-emerald-600">Improve</span> With Confidence.

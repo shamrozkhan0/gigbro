@@ -2,11 +2,9 @@ import { useState, useEffect } from "react";
 import { X, AlertTriangle } from "lucide-react";
 
 export default function BackendNotification() {
-  // Start visible immediately on mount — no synchronous setState-in-effect needed
   const [visible, setVisible] = useState(true);
 
   useEffect(() => {
-    // Auto-dismiss after 3 seconds
     const timer = setTimeout(() => setVisible(false), 3000);
     return () => clearTimeout(timer);
   }, []);

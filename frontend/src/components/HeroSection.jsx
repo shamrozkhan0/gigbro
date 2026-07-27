@@ -44,7 +44,7 @@ function AvatarRating() {
 
 export default function HeroSection() {
   return (
-    <section className="w-full bg-white px-4 py-12 sm:px-6 sm:pt-40 sm:pb-20 lg:px-8">
+    <section className="w-full bg-white px-4 py-12 sm:px-6 sm:pt-40 sm:pb-20 lg:px-8" id="home">
       <div className="mx-auto grid max-w-7xl grid-cols-1 items-center gap-14 lg:grid-cols-2 lg:gap-10">
         {/* Left column */}
         <div>

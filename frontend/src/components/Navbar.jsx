@@ -4,10 +4,9 @@ import { Link } from "react-router-dom";
 
 const NAV_LINKS = [
   { label: "Home", href: "#home" },
-  { label: "Features", href: "#features" },
   { label: "How It Works", href: "#how-it-works" },
-  { label: "Report Preview", href: "#report-preview" },
-  // { label: "`Pricing`", href: "#pricing" },
+  { label: "Analysis", href: "#analysis" },
+  { label: "Pricing", href: "#pricing" },
   { label: "FAQ", href: "#faq" },
 ];
 
@@ -115,7 +114,7 @@ export default function Navbar() {
           : <div className="">
             <Link
               className="flex items-center gap-2 rounded-lg bg-emerald-600 px-5 py-2 text-[15px] font-semibold text-white shadow-sm transition-colors hover:bg-emerald-700" 
-              to="/dahboard">
+              to="/dashboard">
               Dashboard
             </Link>
           </div>

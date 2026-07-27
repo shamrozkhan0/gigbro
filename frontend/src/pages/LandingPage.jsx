@@ -9,8 +9,12 @@ import CTA from "../components/CTA.jsx"
 import Footer from "../components/Footer.jsx"
 import BackendNotification from "../components/BackendNotification.jsx"
 import Pricing from "./Pricing.jsx"
+import { useAuth } from "../../context/AuthContext.jsx"
 
 const LandingPage = () => {
+    const {isAuthenticated, loading} = useAuth()
+    console.log(isAuthenticated);
+    console.log(loading)
     return (
         <>
             <BackendNotification/>
@@ -19,9 +23,9 @@ const LandingPage = () => {
             <ProblemSection/>
             <HowItWorks/>
             <Analysis/>
-            <Faq/>
-            <Pricing/>
             <WhyGigBro/>
+            <Pricing/>
+            <Faq/>
             <CTA/>
             <Footer/>
         </>

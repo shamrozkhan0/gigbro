@@ -6,7 +6,7 @@ import {
 
 const Pricing = () => {
   return (
-    <section className=" bg-white px-6 py-16">
+    <section className=" bg-white px-6 py-16" id="pricing">
       <div className="mx-auto mb-14 max-w-6xl text-center">
         <h2 className="text-xl font-bold tracking-tight text-slate-900 md:text-6xl">
           Choose Your{" "}
@@ -31,17 +31,17 @@ const Pricing = () => {
            bg-gradient-to-br from-green-500 via-green-600 to-green-800 p-10 text-white shadow-2xl">
           {/* Top Section */}
           <div className="flex items-start justify-between">
-              {/* <div className="flex h-14 w-14 items-center justify-center rounded-full border-[6px] border-white">
+            {/* <div className="flex h-14 w-14 items-center justify-center rounded-full border-[6px] border-white">
                 <span className="text-3xl font-black">G</span>
               </div> */}
 
-              <div>
-                <h3 className="text-4xl font-extrabold tracking-tight">
-                    BUDDY
-                </h3>
-             
-              </div>
-              <div className="flex items-baseline gap-2">
+            <div>
+              <h3 className="text-4xl font-extrabold tracking-tight">
+                BUDDY
+              </h3>
+
+            </div>
+            <div className="flex items-baseline gap-2">
               <span className="text-4xl font-bold">
                 $0
               </span>
@@ -51,7 +51,7 @@ const Pricing = () => {
               </span>
             </div>
 
-         
+
           </div>
 
           {/* Contactless Icon */}
@@ -132,9 +132,9 @@ const Pricing = () => {
           </div>
 
           {/* Contactless Icon */}
-          <div className="absolute right-10 top-36">
+          <div className="absolute right-10 top-30">
             <Wifi
-              size={48}
+              size={28}
               strokeWidth={3}
               className="rotate-90"
             />
@@ -148,13 +148,13 @@ const Pricing = () => {
             </h4> */}
 
             <p className="mt-4 text-md text-white/80">
-              For serious sellers who want to rank higher
+              For serious sellers <br className="block sm:hidden"/> who want to rank higher
             </p>
 
             <div className="my-8 h-px w-full bg-white/30" />
 
             {/* Features */}
-            <div className="flex items-center gap-7">
+            <div className="flex items-center gap-7 flex-col sm:flex-row justify-between">
               {/* Lite Reports */}
               <div className="flex items-center gap-4">
                 <div className="flex h-16 w-16 shrink-0 items-center justify-center rounded-2xl border border-green-500/60 bg-green-950/30">

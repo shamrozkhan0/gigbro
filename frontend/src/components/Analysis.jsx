@@ -192,7 +192,7 @@ function GigReportCard() {
 
 export default function Analysis() {
   return (
-    <section className="w-full bg-slate-50 px-4 py-16 sm:px-6 sm:py-20 lg:px-8">
+    <section className="w-full bg-slate-50 px-4 py-16 sm:px-6 sm:py-20 lg:px-8" id="analysis">
       <div className="mx-auto max-w-7xl">
         {/* Header */}
         <div className="mx-auto max-w-3xl text-center">
