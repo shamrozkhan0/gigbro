@@ -1,29 +1,13 @@
-html,
-body {
-  margin: 0;
-  padding: 0;
-  width: 400px;
-  min-height: 500px;
-  border-radius: 20px;
-  overflow: hidden;
-}
-
-#root {
-  width: 100%;
-  min-height: 500px;
-  border-radius: 20px;
-  overflow: hidden;
-}
-/* body {
+ html,body {
+    margin: 0;
+    padding: 0;
     background-color: transparent;
-    /* background-color: #20b57263; */
-    /* margin: 20px; */
-    /* font-family: Arial, sans-serif; */
-    /* width: 350px; */
-    /* height: 500px; */
-    /* border-radius: 100%; */
-    /* overflow: hidden !important; */
-/* } */
+     font-family: Arial, sans-serif; 
+     overflow: hidden !important; 
+     width: 400px;
+     height: 300px !important; 
+     overflow: scroll;
+} 
 
 #root {
   border-radius: 100% !important;
@@ -57,10 +41,10 @@ body {
 .py-50 {
     padding: 50px 30px;
 }
-
+/* 
 .gap-20 {
     gap: 20px;
-}
+} */
 
 .flex-column {
     flex-direction: column;
@@ -68,6 +52,7 @@ body {
 
 .container-fluid{
     position: relative;
+    width: 100%;
 }
 
 .container {
@@ -96,19 +81,15 @@ body {
 }
 
 .login-gigbro-logo{
-    max-width: 100px;
-    max-height: 100px;
-    border-radius: 100%;
+    max-width: 50px;
+    max-height: 50px;
 }
 
-.row {
-    /* border-radius: 40px; */
-}
+
 
 .container img {
     max-width: 100%;
     height: auto;
-    /* border-radius: 100%; */
 }
 
 button {
@@ -199,3 +180,33 @@ button {
         visibility: hidden;
     }
 }
+
+.wrapper{
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    padding: 20px !important;
+    margin: 20px;
+}
+
+#logout{
+    color: white;
+    background-color: rgb(221, 59, 59);
+    padding: 10px 12px;
+    border: 0px;
+    border-radius: 20px;
+    position: absolute;
+    top: 10px;
+    left: 10px;
+
+}
+
+.bar{
+    width: 100%;
+    height: 10px;
+    background-color: #16a34a;
+}
+

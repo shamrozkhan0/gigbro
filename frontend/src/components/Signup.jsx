@@ -1,6 +1,6 @@
 import GigBroLogo from "../images/logo.png"
 import { useNavigate } from "react-router-dom";
-import { useNotification } from "../../context/NotificationContext";
+import { useNotification } from "../context/NotificationContext";
 import { useState } from "react";
 
 const Signup = () => {
@@ -38,6 +38,8 @@ const Signup = () => {
       success: data.success,
       message: data.message
     })
+
+    if (data.success) navigate("/login");
 
   };
 

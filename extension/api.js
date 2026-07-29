@@ -3,8 +3,8 @@ const BACKEND_URL = "http://localhost:8000/"
 
 
 const loginHTML = `
-    <div class="row display-flex align-items-center justify-center flex-column py-50 gap-20">
-        <img src="./images/gigBro-logo.png" alt="" class="login-gigbro-logo">
+    <div class="row display-flex align-items-center justify-center flex-column py-50 gap-10">
+        <img src="./images/gig-logo.png" alt="" class="login-gigbro-logo">
         <h2>Welcome to GigBro</h2>
         <p class="text-center text">Looks like you are not logged in </br>
          please login to continue and access all features </p>
@@ -16,6 +16,7 @@ const scrapperHTML = `
     <h1>Scrapper</h1>
     <button id="btn">Start Scrapping</button>
     <button id="logout">logout</button>
+    <div class="bar"></div>
     <p id="output">Nothing yet</p>
   `
 
@@ -88,6 +89,8 @@ async function isFiverTab() {
   }).then(res => res.ok ? true : false).catch(err => {
     console.error(err)
   });
+
+  console.log("login:", isLoggedIn)
 
 
   if (isLoggedIn) {

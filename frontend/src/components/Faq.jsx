@@ -46,7 +46,7 @@ const FAQS = [
     icon: Headphones,
     question: "Do you offer support?",
     answer:
-      "Yes, our support team is available to help with setup, questions about your report, or anything else you need.",
+      "Yes, shamroz is available to help with setup, questions about your report, or anything else you need just contact him.",
   },
 ];
 

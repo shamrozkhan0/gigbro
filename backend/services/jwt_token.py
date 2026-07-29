@@ -12,18 +12,20 @@ load_dotenv()
 log.basicConfig(level=log.INFO, format="%(asctime)s - %(name)s - %(levelname)s - %(message)s",)
 
 
-def create_token(user: LoginUser):
+def create_token(email:str, username:str, is_premium_user):
     secret_key = os.getenv("JWT_SECRET_KEY")
     algorithm = os.getenv("JWT_ALGORITHM")
 
     pay_load = {
-        "email": user.email,
+        "email": email,
+        "username": username,
+        "is_premium_user": is_premium_user,
         "exp": datetime.datetime.now(datetime.timezone.utc) + datetime.timedelta(hours=1)
     }
 
     try:
         jwt_token = jwt.encode(pay_load, secret_key, algorithm=algorithm)
-        log.info(f"| Success JWT token successfully created for user with email: {user.email} {jwt_token}")
+        log.info(f"| Success JWT token successfully created for user with email: {email} {jwt_token}")
         return jwt_token
     except jwt.PyJWKError as e:
         log.error(f"| Error creating JWT token:  {e}")

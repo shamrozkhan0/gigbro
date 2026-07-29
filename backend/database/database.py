@@ -66,9 +66,13 @@ class Database:
                                 id INT PRIMARY KEY AUTO_INCREMENT,
                                 username VARCHAR(15) UNIQUE NOT NULL,
                                 email VARCHAR(50) UNIQUE NOT NULL,
-                                password VARCHAR(20) NOT NULL
+                                password VARCHAR(20) NOT NULL,
+                                is_premium_user bool NOT NULL,
+                                lite_report_limit INT NOT NULL,
+                                full_report_limit INT NOT NULL,
+                                reports json
                                 )"""
-        register_user_query = f"""INSERT INTO {self.auth_table_name} (username, email, password) VALUES (%s, %s, %s)"""
+        register_user_query = f"""INSERT INTO {self.auth_table_name} (username, email, password, is_premium_user, lite_report_limit, full_report_limit, reports) VALUES (%s, %s, %s, %s, %s, %s, %s)"""
         try:
             database_connection = self._connect_with_database()
 
@@ -97,6 +101,10 @@ class Database:
                         user.username,
                         user.email,
                         user.password,
+                        True,
+                        3,
+                        0,
+                        None
                 ))
                 log.info(f"| Successfully register a user with email {user.email}")
 
@@ -116,7 +124,7 @@ class Database:
 
 
     def verify_user(self, user):
-        verify_user_query = f"""SELECT email,password FROM {self.auth_table_name} WHERE email = %s"""
+        verify_user_query = f"""SELECT email, password, username, is_premium_user FROM {self.auth_table_name} WHERE email = %s"""
         try:
             conn = self._connect_with_database()
             if not self.check_if_user_exist_by_email(conn, user.email):
@@ -127,11 +135,11 @@ class Database:
 
             with conn.cursor() as cursor:
                 cursor.execute(verify_user_query, (user.email,))
-                email,password = cursor.fetchone()
+                email,password,username, is_premium_user = cursor.fetchone()
                 conn.close()
-                jwt_token = create_token(user)
 
                 if user.password == password:
+                    jwt_token = create_token(email, username, is_premium_user)
                     return {
                         "success": True,
                         "message": "Login Successfully",
@@ -158,7 +166,7 @@ class Database:
             log.info(e)
 
 
-    def setContent(self, data, email):
+    def setContent(self, data, user):
         table_query = """CREATE TABLE data (
             content_id INT PRIMARY KEY AUTO_INCREMENT,
             profile_id INT NOT NULL,
@@ -204,7 +212,7 @@ class Database:
                     log.info(f"| Successfully created table '{self.data_table_name}'.")
 
                 log.info("Inserting gig data into database")
-                profile_id = self.get_id_by_email(email)
+                profile_id = self.get_id_by_email(user["email"])
                 print(data.ratings)
 
                 if type(data.ratings) == str:
@@ -261,3 +269,6 @@ class Database:
             content.pop("profile_id")
             content.pop("content_id")
             return {"success": True, "message": content}
+
+    def get_user_dashboard(self):
+        ...

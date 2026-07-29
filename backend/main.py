@@ -2,7 +2,7 @@ from fastapi import FastAPI, Response, Cookie, HTTPException
 from entity.authentication import LoginUser, SignupUser
 from fastapi.middleware.cors import CORSMiddleware
 from services.jwt_token import verify_jwt
-from services.database import Database
+from database.database import Database
 from ai.analyzer import Analyzer
 from dotenv import load_dotenv
 from pydantic import BaseModel
@@ -11,10 +11,8 @@ import logging as log
 import pymysql
 import os
 
-
 app = FastAPI()
 load_dotenv()
-
 
 app.add_middleware(
     CORSMiddleware,
@@ -24,9 +22,7 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-
 log.basicConfig(level=log.INFO, format='%(asctime)s - %(levelname)s - %(filename)s - %(message)s',)
-
 
 @app.post("/signup")
 def register_user(user: SignupUser):
@@ -40,6 +36,7 @@ def login_user(user: LoginUser, response: Response):
     log.info("| Reviewed Login request")
     db = Database()
     result = db.verify_user(user)
+    print("result:", result)
 
     if result["success"] == False:
         print(result)
@@ -71,7 +68,7 @@ def get_me(jwt_token: str = Cookie(None)):
 def logout(response: Response):
     response.delete_cookie(key="jwt_token")
     log.info("| logout completed")
-    return {"message": "logout"}
+    return {"success": True, "message": "logout Successfully"}
 
 
 @app.post("/savecontent")
@@ -80,9 +77,8 @@ def save_content(data: Data, jwt_token: str = Cookie()):
         raise HTTPException(401, "Token not found")
     user = verify_jwt(jwt_token)
     db = Database()
-    result = db.setContent(data, user["email"])
+    result = db.setContent(data, user["user"])
     return {"success": True, "message": "Save successfully", "content_id": result["content_id"], "user_id": result["user_id"]}
-
 
 
 class ContentRequest(BaseModel):
@@ -102,6 +98,15 @@ def get_content(user_id:int, content_id:int,jwt_token=Cookie(...)):
     return result
 
 
+@app.get("/dasboard/{username}")
+def getUserDashboard(username: str, jwt:str = Cookie()):
+    ...
+
+
+
+
+
+# ==================== For testing =====================
 @app.get("/get")
 def analyze():
     query = f""" SELECT * FROM data"""

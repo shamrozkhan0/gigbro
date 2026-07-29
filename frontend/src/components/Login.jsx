@@ -1,15 +1,17 @@
 import GigBroLogo from "../images/logo.png"
 import { useNavigate } from "react-router-dom"
-import { useNotification } from "../../context/NotificationContext";
+import { useNotification } from "../context/NotificationContext";
 import { useState } from "react"
+import { useAuth } from "../context/AuthContext";
 
 const Login = () => {
+  const {setIsAuthenticated, setUser, setLoading, checkAuthentication} = useAuth()
   const logniURL = import.meta.env.VITE_BACKEND_URL + "login"
   console.log(GigBroLogo)
   const { showNotification } = useNotification()
   const [password, setPassword] = useState(null)
   const [email, setEmail] = useState(null)
-  const my_navigate = useNavigate();
+  const navigate = useNavigate();
 
 
   const submitForm = async (e) => {
@@ -25,15 +27,21 @@ const Login = () => {
         email,
         password,
       }),
-    });  
+    });
 
     const data = await response.json();
-    console.log(data)
 
     showNotification({
       success: data.success,
       message: data.message,
     });
+
+    if (data.success) {
+      await checkAuthentication()
+      console.log("use is logged in")
+      navigate("/dashboard");
+    }
+
   };
 
 
@@ -46,7 +54,7 @@ const Login = () => {
         {/* Logo */}
         <div className="flex flex-col items-center">
           <div className="w-20 h-20 rounded-full  flex items-center justify-center shadow-md">
-            <img src={GigBroLogo} alt="GigBro login"/>
+            <img src={GigBroLogo} alt="GigBro login" />
           </div>
 
           <h1 className="mt-4 text-2xl font-bold text-gray-800">
@@ -99,7 +107,7 @@ const Login = () => {
 
             <p className="text-right text-sm text-gray-500">
               Already have an account?{" "}
-              <button type="button" onClick={() => my_navigate("/signup")} className="cursor-pointer font-bold text-slate-800 hover:text-emerald-600">
+              <button type="button" onClick={() => navigate("/signup")} className="cursor-pointer font-bold text-slate-800 hover:text-emerald-600">
                 Sign Up
               </button>
             </p>
