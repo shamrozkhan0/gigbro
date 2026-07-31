@@ -5,11 +5,7 @@ import { useNavigate } from "react-router-dom";
 import { logout } from "../utils/logout.js"
 
 import {
-  Home,
-  Folder,
   Plus,
-  BarChart2,
-  Settings,
   ChevronDown,
   LogOut,
   MoreVertical,
@@ -72,15 +68,14 @@ const scoreColor = (score) => {
 };
 
 const navItems = [
-  { label: "Dashboard", icon: Home, active: true },
-  { label: "My Projects", icon: Folder },
-  { label: "New Analysis", icon: Plus },
-  { label: "Reports", icon: BarChart2 },
-  { label: "Settings", icon: Settings },
+  // { label: "Dashboard", icon: Home, active: true },
+  // { label: "My Projects", icon: Folder },
+  // { label: "New Analysis", icon: Plus },
+  // { label: "Reports", icon: BarChart2 },
+  // { label: "Settings", icon: Settings },
 ];
 
 const Dashboard = () => {
-  console.log("in dashbpard")
   const { setIsAuthenticated, setUser, setLoading } = useAuth()
   const {user} = useAuth();
 

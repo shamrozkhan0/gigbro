@@ -14,6 +14,7 @@ function App() {
         <Routes>         
           {/* Public Routes */}
           <Route path="/" element={<LandingPage />} />
+          <Route path="/dashboarddemo" element={<Dashboard/>} />
           
           {/* Authentication Routes contains Login and Signup pages */}
           <Route element={<Auth/>}>
