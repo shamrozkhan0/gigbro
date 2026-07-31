@@ -1,6 +1,7 @@
 from entity.authentication import SignupUser
 from services.jwt_token import create_token
 from dotenv import load_dotenv
+from . import database_utils
 import logging as log
 from os import getenv
 import pymysql
@@ -45,22 +46,6 @@ class Database:
             return e
 
 
-    def check_if_user_exist_by_email(self, conn, email):
-        verify_user_query = f"""SELECT EXISTS(SELECT 1 FROM {self.auth_table_name} WHERE email = %s) AS email_exists"""
-        with conn.cursor() as cursor:
-            cursor.execute(verify_user_query, (email,))
-            is_exist = cursor.fetchone()
-            return is_exist[0]
-
-
-    def check_if_username_exist_in_database(self, conn, username):
-        query = f""" SELECT EXISTS(SELECT 1 FROM {self.auth_table_name} WHERE username = %s) AS username_exists """
-        with conn.cursor() as cursor:
-            cursor.execute(query, (username,))
-            is_exist = cursor.fetchone()
-            return is_exist[0]
-
-
     def register_user(self, user : SignupUser):
         create_table_query = f"""CREATE TABLE {self.auth_table_name} (
                                 id INT PRIMARY KEY AUTO_INCREMENT,
@@ -70,9 +55,9 @@ class Database:
                                 is_premium_user bool NOT NULL,
                                 lite_report_limit INT NOT NULL,
                                 full_report_limit INT NOT NULL,
-                                reports json
+                                projects json
                                 )"""
-        register_user_query = f"""INSERT INTO {self.auth_table_name} (username, email, password, is_premium_user, lite_report_limit, full_report_limit, reports) VALUES (%s, %s, %s, %s, %s, %s, %s)"""
+        register_user_query = f"""INSERT INTO {self.auth_table_name} (username, email, password, is_premium_user, lite_report_limit, full_report_limit, projects) VALUES (%s, %s, %s, %s, %s, %s, %s)"""
         try:
             database_connection = self._connect_with_database()
 
@@ -83,13 +68,13 @@ class Database:
                     cursor.execute(create_table_query)
                     log.info(f"| Success: created '{self.auth_table_name}' table in the database.")
 
-                if self.check_if_user_exist_by_email(database_connection, user.email):
+                if database_utils.check_if_user_exist_by_email(self.auth_table_name, database_connection, user.email):
                     return {
                         "success": False,
                         "message": f"User with email {user.email} already exist."
                     }
 
-                if self.check_if_username_exist_in_database(database_connection, user.username):
+                if database_utils.check_if_username_exist_in_database(database_connection,self.auth_table_name, user.username):
                     return {
                         "success": False,
                         "message": f"Username already exist try a different username"
@@ -101,7 +86,7 @@ class Database:
                         user.username,
                         user.email,
                         user.password,
-                        True,
+                        False,
                         3,
                         0,
                         None
@@ -127,7 +112,7 @@ class Database:
         verify_user_query = f"""SELECT email, password, username, is_premium_user FROM {self.auth_table_name} WHERE email = %s"""
         try:
             conn = self._connect_with_database()
-            if not self.check_if_user_exist_by_email(conn, user.email):
+            if not database_utils.check_if_user_exist_by_email(self.auth_table_name, conn, user.email):
                 return {
                     "success": False,
                     "message": f"User with email {user.email} doesn't exist"
@@ -153,17 +138,6 @@ class Database:
 
         except pymysql.Error as e:
             log.error(e)
-
-
-    def get_id_by_email(self, email):
-        get_id_by_email_query = f"""SELECT id FROM {self.auth_table_name} WHERE email = %s"""
-        conn = self._connect_with_database()
-        try:
-            with conn.cursor() as cursor:
-                cursor.execute(get_id_by_email_query, (email,))
-                return cursor.fetchone()
-        except pymysql.Error as e:
-            log.info(e)
 
 
     def setContent(self, data, user):
@@ -212,7 +186,7 @@ class Database:
                     log.info(f"| Successfully created table '{self.data_table_name}'.")
 
                 log.info("Inserting gig data into database")
-                profile_id = self.get_id_by_email(user["email"])
+                profile_id = database_utils.get_id_by_email(conn, self.auth_table_name, user["email"])
                 print(data.ratings)
 
                 if type(data.ratings) == str:
@@ -271,4 +245,7 @@ class Database:
             return {"success": True, "message": content}
 
     def get_user_dashboard(self):
+        ...
+
+    def save_report_in_database(self):
         ...
