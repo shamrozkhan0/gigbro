@@ -12,4 +12,4 @@ class SignupUser(BaseModel):
     is_premium_user: bool = False
     lite_report_limit: int = None
     full_report_limit: int = None
-    reports: dict = None
+    projects: dict = None

@@ -13,12 +13,28 @@ const loginHTML = `
     `
 
 const scrapperHTML = `
+<div class="card">
     <h1>Scrapper</h1>
+ 
+    <div class="icon-blanket">
+     <div class="icon-wrapper">
+      <div class="icon-circle" id="iconCircle">
+        <svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"></polyline></svg>
+      </div>
+     </div>
+    </div>
+ 
+    <p id="output">Click the scrapp button to scrap the gig</p>
+      <p class="subtext" id="subtext"></p>
+ 
+    <div class="bar-track">
+      <div class="bar" id="bar"></div>
+    </div>
+ 
     <button id="btn">Start Scrapping</button>
-    <button id="logout">logout</button>
-    <div class="bar"></div>
-    <p id="output">Nothing yet</p>
-  `
+    <button id="logout">Logout</button>
+  </div>
+`
 
 
 async function senddata(data) {
@@ -149,37 +165,99 @@ const showScrapper = () => {
 
   container.innerHTML = scrapperHTML;
 
+  // document.getElementById("btn").addEventListener("click", async () => {
+  //   try {
+  //     console.log("button is clicked")
+  //     const [tab] = await chrome.tabs.query({
+  //       active: true,
+  //       currentWindow: true
+  //     });
 
-  document.getElementById("btn").addEventListener("click", async () => {
-    try {
-      console.log("button is clicked")
-      const [tab] = await chrome.tabs.query({
-        active: true,
-        currentWindow: true
-      });
+  //     await chrome.scripting.executeScript({
+  //       target: { tabId: tab.id },
+  //       files: ["dist/scrapper.js"]
+  //     })
+  //   }
 
-      await chrome.scripting.executeScript({
-        target: { tabId: tab.id },
-        files: ["dist/scrapper.js"]
-      })
-    }
+  //   catch (error) {
+  //     console.error("Error: ", error)
+  //   }
 
-    catch (error) {
-      console.error("Error: ", error)
-    }
-
-    // console.log("content is scrapped", isScrapped)
-    // if (isScrapped.status){
-    //   let url = WEB_URL + isScrapped.user_id + "/" + isScrapped.content_id
-    //   console.log(url)
-    //  setTimeout(()=>{
-    //   //  chrome.tabs.create({ url: url }); 
-    //  },3200)
-    // }
-  });
+  // console.log("content is scrapped", isScrapped)
+  // if (isScrapped.status){
+  //   let url = WEB_URL + isScrapped.user_id + "/" + isScrapped.content_id
+  //   console.log(url)
+  //  setTimeout(()=>{
+  //   //  chrome.tabs.create({ url: url }); 
+  //  },3200)
+  // }
+  // });
 
   // Logout Button
   document.getElementById("logout").addEventListener("click", () => {
     logout()
   })
+
+
+
+  const btn = document.getElementById('btn');
+  const logoutBtn = document.getElementById('logout');
+  const bar = document.getElementById('bar');
+  const output = document.getElementById('output');
+  const subtext = document.getElementById('subtext');
+  const iconCircle = document.getElementById('iconCircle');
+  const iconBlanket = document.querySelector(".icon-blanket")
+
+  let scraping = false;
+
+  function resetUI() {
+    bar.style.width = '0%';
+    output.textContent = 'Click the scrapp button to scrap the gig';
+    subtext.textContent = '';
+    iconCircle.classList.remove('show');
+    iconBlanket.classList.remove("show");
+  }
+
+  btn.addEventListener('click', () => {
+    if (scraping) return;
+    scraping = true;
+
+    btn.disabled = true;
+    btn.textContent = 'Scrapping...';
+    iconCircle.classList.remove('show');
+    iconBlanket.classList.remove("show");
+    output.textContent = 'Scraping in progress...';
+    subtext.textContent = '';
+    bar.style.width = '0%';
+
+    let progress = 0;
+    const interval = setInterval(() => {
+      progress += Math.random() * 18 + 7;
+      if (progress >= 100) {
+        progress = 100;
+        clearInterval(interval);
+
+        bar.style.width = '100%';
+        output.textContent = 'Gig Scraped Successfully!';
+        subtext.textContent = 'Redirecting for analysis...';
+        iconCircle.classList.add('show');
+        iconBlanket.classList.add('show');
+
+        btn.disabled = false;
+        btn.textContent = 'Start Scrapping';
+        scraping = false;
+      } else {
+        bar.style.width = progress + '%';
+      }
+    }, 250);
+
+    setTimeout(() => {
+        chrome.tabs.create({ url: WEB_URL + "dashboard" });
+    }, 500);
+
+  });
+
+
+
+
 };

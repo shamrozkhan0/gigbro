@@ -6,8 +6,15 @@ import Signup from "./components/Signup.jsx"
 import Login from "./components/Login.jsx"
 import Auth from "./pages/Auth.jsx"
 import "./App.css"
+import NotFound from "./pages/NotFound.jsx"
+import { useAuth } from "./context/AuthContext.jsx" 
 
 function App() {
+  const { isAuthenticated, user } = useAuth();
+  console.log("ProtectedRoute", {
+  isAuthenticated,
+  user,
+});
   return (
     <>
       <BrowserRouter>
@@ -15,6 +22,7 @@ function App() {
           {/* Public Routes */}
           <Route path="/" element={<LandingPage />} />
           <Route path="/dashboarddemo" element={<Dashboard/>} />
+          <Route path="*" element={<NotFound/>}/> 
           
           {/* Authentication Routes contains Login and Signup pages */}
           <Route element={<Auth/>}>
@@ -23,16 +31,13 @@ function App() {
           </Route>
 
           {/* Private routes only accessable when user is authenticated */}
-          
           <Route element={<ProtectedRoutes/>}>
             <Route path="/dashboard" element={<Dashboard/>} />
           </Route>
 
-
         </Routes>
       </BrowserRouter>
     </>
-
   )
 }
 

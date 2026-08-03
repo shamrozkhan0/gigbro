@@ -1,8 +1,9 @@
 import DashboardAnalyzeGig from "../images/dashboard-analyze-gig.png"
-import GigBroLogo from "../images/logo.png"
-import { useState } from "react";
+import { useAuth } from "../context/AuthContext";
 import { useNavigate } from "react-router-dom";
-import { logout } from "../utils/logout.js"
+import { useState } from "react";
+import GigBroLogo from "../images/logo.png";
+import { logout } from "../utils/logout.js";
 
 import {
   Plus,
@@ -12,54 +13,54 @@ import {
   Crown,
   Info,
 } from "lucide-react";
-import { useAuth } from "../context/AuthContext";
 
-const projects = [
-  {
-    id: 1,
-    name: "WordPress Website Development",
-    category: "Web Development",
-    initial: "W",
-    color: "bg-green-100 text-green-700",
-    score: 78,
-    type: "Pro Analysis",
-    typeColor: "bg-purple-100 text-purple-600",
-    lastAnalyzed: "2 days ago",
-  },
-  {
-    id: 2,
-    name: "Shopify Store Design & Redesign",
-    category: "E-Commerce",
-    initial: "S",
-    color: "bg-orange-100 text-orange-600",
-    score: 65,
-    type: "Lite Report",
-    typeColor: "bg-green-100 text-green-700",
-    lastAnalyzed: "5 days ago",
-  },
-  {
-    id: 3,
-    name: "SEO Backlinks for Website",
-    category: "Digital Marketing",
-    initial: "S",
-    color: "bg-blue-100 text-blue-600",
-    score: 82,
-    type: "Pro Analysis",
-    typeColor: "bg-purple-100 text-purple-600",
-    lastAnalyzed: "1 week ago",
-  },
-  {
-    id: 4,
-    name: "Landing Page Design in Figma",
-    category: "Graphics & Design",
-    initial: "L",
-    color: "bg-purple-100 text-purple-600",
-    score: 58,
-    type: "Lite Report",
-    typeColor: "bg-green-100 text-green-700",
-    lastAnalyzed: "1 week ago",
-  },
-];
+
+// const projects = [
+//   {
+//     id: 1,
+//     name: "WordPress Website Development",
+//     category: "Web Development",
+//     initial: "W",
+//     color: "bg-green-100 text-green-700",
+//     score: 78,
+//     type: "Pro Analysis",
+//     typeColor: "bg-purple-100 text-purple-600",
+//     lastAnalyzed: "2 days ago",
+//   },
+//   {
+//     id: 2,
+//     name: "Shopify Store Design & Redesign",
+//     category: "E-Commerce",
+//     initial: "S",
+//     color: "bg-orange-100 text-orange-600",
+//     score: 65,
+//     type: "Lite Report",
+//     typeColor: "bg-green-100 text-green-700",
+//     lastAnalyzed: "5 days ago",
+//   },
+//   {
+//     id: 3,
+//     name: "SEO Backlinks for Website",
+//     category: "Digital Marketing",
+//     initial: "S",
+//     color: "bg-blue-100 text-blue-600",
+//     score: 82,
+//     type: "Pro Analysis",
+//     typeColor: "bg-purple-100 text-purple-600",
+//     lastAnalyzed: "1 week ago",
+//   },
+//   {
+//     id: 4,
+//     name: "Landing Page Design in Figma",
+//     category: "Graphics & Design",
+//     initial: "L",
+//     color: "bg-purple-100 text-purple-600",
+//     score: 58,
+//     type: "Lite Report",
+//     typeColor: "bg-green-100 text-green-700",
+//     lastAnalyzed: "1 week ago",
+//   },
+// ];
 
 const scoreColor = (score) => {
   if (score >= 75) return "bg-green-100 text-green-700";
@@ -76,8 +77,12 @@ const navItems = [
 ];
 
 const Dashboard = () => {
-  const { setIsAuthenticated, setUser, setLoading } = useAuth()
-  const {user} = useAuth();
+  const {isAuthenticated, setIsAuthenticated, user, setUser} = useAuth()
+  const BACKEND_URL = import.meta.env.VITE_BACKEND_URL
+  const [reports, setReports] = useState([])
+  
+
+  console.log(user)
 
   const [menuOpen, setMenuOpen] = useState(false);
   const navigate = useNavigate()
@@ -89,17 +94,15 @@ const Dashboard = () => {
   const proLimit = 3;
 
   async function handleLogout() {
-
     const isLogout = await logout()
-
     if (isLogout.success) {
       setIsAuthenticated(false)
       setUser(null)
-      setLoading(true)
       navigate("/")
     }
-
   }
+
+
 
   return (
     <div className="flex h-screen w-screen bg-gray-50 text-gray-900 ">
@@ -208,8 +211,15 @@ const Dashboard = () => {
       {/* Main content */}
       <main className="flex-1 overflow-y-auto">
         {/* Topbar */}
-        <div className="flex items-center justify-end gap-4 border-b border-gray-100 bg-white px-6 py-4 md:px-10">
-          <div className="flex items-center gap-2 rounded-full border border-gray-100 bg-gray-50 px-4 py-2 text-sm">
+
+        <div className="flex items-center justify-between md:justify-end gap-4 border-b border-gray-100 bg-white px-6 py-4 md:px-10">
+          <div className="flex md:hidden items-center gap-2 px-2">
+            <img src={GigBroLogo} alt="Gigbro Logo" className="w-10 h-10" />
+            <span className="text-xl font-bold text-fiver-green">GigBro</span>
+          </div>
+
+          <div className="flex items-center gap-2">
+            <div className="flex items-center gap-2 rounded-full border border-gray-100 bg-gray-50 px-4 py-2 text-sm">
             <span className="flex items-center gap-1.5">
               <span className="h-2 w-2 rounded-full bg-fiver-green" />
               Lite: {liteLimit - liteUsed} left
@@ -246,7 +256,7 @@ const Dashboard = () => {
               </div>
             )}
           </div>
-
+          </div>
 
         </div>
 
@@ -295,7 +305,7 @@ const Dashboard = () => {
                 </tr>
               </thead>
               <tbody>
-                {projects.map((p) => (
+                {reports.map((p) => (
                   <tr key={p.id} className="border-t border-gray-50">
                     <td className="px-6 py-4">
                       <div className="flex items-center gap-3">

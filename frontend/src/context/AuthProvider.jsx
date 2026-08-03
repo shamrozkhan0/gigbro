@@ -3,6 +3,7 @@ import { AuthContext } from "./AuthContext";
 
 const AuthProvider = ({ children }) => {
     const [isAuthenticated, setIsAuthenticated] = useState(false);
+    const [loading, setLoading] = useState(true);
     const [user, setUser] = useState(null);
 
     const AUTH_URL = `${import.meta.env.VITE_BACKEND_URL}me`;
@@ -10,14 +11,12 @@ const AuthProvider = ({ children }) => {
     const checkAuthentication = useCallback(async () => {
         try {
             const response = await fetch(AUTH_URL, {
-                method: "GET",
                 credentials: "include",
             });
 
             const data = await response.json();
 
-
-            if (!data.success) {
+            if (!response.ok || !data.success) {
                 setIsAuthenticated(false);
                 setUser(null);
                 return;
@@ -25,11 +24,8 @@ const AuthProvider = ({ children }) => {
 
             setUser(data.user);
             setIsAuthenticated(true);
-
-        } catch (error) {
-            console.error("Authentication error:", error);
-            setIsAuthenticated(false);
-            setUser(null);
+        } finally {
+            setLoading(false);
         }
     }, [AUTH_URL]);
 
@@ -39,14 +35,15 @@ const AuthProvider = ({ children }) => {
 
     return (
         <AuthContext.Provider
-            value={{
-                isAuthenticated,
-                user,
-                setIsAuthenticated,
-                setUser,
-                checkAuthentication
-            }}
-        >
+    value={{
+        loading,
+        isAuthenticated,
+        user,
+        setIsAuthenticated,
+        setUser,
+        checkAuthentication
+    }}
+>
             {children}
         </AuthContext.Provider>
     );

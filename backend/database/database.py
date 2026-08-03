@@ -16,6 +16,7 @@ class Database:
     def __init__(self):
         self.auth_table_name = "user"
         self.data_table_name = "data"
+        self.report_table_name = "reports"
 
 
     def _connect_with_database(self):
@@ -29,20 +30,6 @@ class Database:
             return connection
         except pymysql.Error as e:
             log.info(f"| Error connecting with Database {e}")
-            return e
-
-
-    def is_table_exist(self, table_name:str):
-        is_table_exist_query = f"""SHOW TABLES LIKE %s"""
-        connection = self._connect_with_database()
-        try:
-            with connection.cursor() as cursor:
-                cursor.execute(is_table_exist_query, (table_name,))
-                result = cursor.fetchone()
-                connection.close()
-                return True if result else False
-        except pymysql.Error as e:
-            log.info(f"| Error while checking if database exist {e} ")
             return e
 
 
@@ -63,7 +50,7 @@ class Database:
 
             with database_connection.cursor() as cursor:
 
-                if not self.is_table_exist(self.auth_table_name):
+                if not database_utils.is_table_exist(database_connection, self.auth_table_name):
                     log.info(f"| Table '{self.auth_table_name}' does not exist in database")
                     cursor.execute(create_table_query)
                     log.info(f"| Success: created '{self.auth_table_name}' table in the database.")
@@ -141,7 +128,7 @@ class Database:
 
 
     def setContent(self, data, user):
-        table_query = """CREATE TABLE data (
+        table_query = f"""CREATE TABLE {self.data_table_name} (
             content_id INT PRIMARY KEY AUTO_INCREMENT,
             profile_id INT NOT NULL,
             url VARCHAR(150) NOT NULL,
@@ -180,14 +167,13 @@ class Database:
         try:
             conn = self._connect_with_database();
             with conn.cursor() as cursor:
-                if not self.is_table_exist(self.data_table_name):
+                if not database_utils.is_table_exist(conn, self.data_table_name):
                     log.info("| Creating table for storing data.")
                     cursor.execute(table_query)
                     log.info(f"| Successfully created table '{self.data_table_name}'.")
 
                 log.info("Inserting gig data into database")
                 profile_id = database_utils.get_id_by_email(conn, self.auth_table_name, user["email"])
-                print(data.ratings)
 
                 if type(data.ratings) == str:
                     data.ratings = {"message": data.ratings}
@@ -244,8 +230,45 @@ class Database:
             content.pop("content_id")
             return {"success": True, "message": content}
 
-    def get_user_dashboard(self):
-        ...
+
+    def save_report(self, username, title, report):
+        create_report_table_query = f""" CREATE TABLE {self.report_table_name} (
+            report_id INT PRIMARY KEY AUTO_INCREMENT,
+            username VARCHAR(15) NOT NULL,
+            title VARCHAR(255) NOT NULL,
+            report json,
+            FOREIGN KEY (username) REFERENCES `user`(username)
+        )
+        """
+        insert_report_query = f""" INSERT INTO {self.report_table_name} (
+            username,
+            title,
+            report
+        )  VALUES (%s, %s, %s)"""
+
+        try:
+            conn = self._connect_with_database()
+            with conn.cursor() as cursor:
+                if not database_utils.is_table_exist(conn, self.report_table_name):
+                    log.warning(f"| WARNING: Schema '{self.report_table_name}' does not exist")
+                    cursor.execute(create_report_table_query)
+                    log.info(f"| Success: Created schema '{self.report_table_name}'. ")
+                    conn.commit()
+                cursor.execute(insert_report_query, (username, title, json.dumps(report)))
+                conn.commit()
+        except pymysql.Error as e:
+            log.error(f"| Error: {e}")
+
+
+    def get_reports_by_username(self, username):
+        query = f""" SELECT resport_id, title FROM {self.report_table_name} WHERE username = %s """
+        try:
+            conn = self._connect_with_database()
+            with conn.cursor() as cursor:
+                cursor.execute(query, (username,))
+                return cursor.fetchall()
+        except pymysql.Error as e:
+            log.error(f"| Error: {e}")
 
     def save_report_in_database(self):
         ...

@@ -35,6 +35,7 @@ def verify_jwt(jwt_token: str):
     try:
         log.info("verifying jwt token")
         user = jwt.decode(jwt=jwt_token, key=os.getenv("JWT_SECRET_KEY"), algorithms=os.getenv("JWT_ALGORITHM"))
+        print(user)
         return {"success": True, "user": user}
     except ExpiredSignatureError as e:
         log.error(f"| Error: {e}")

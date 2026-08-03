@@ -6,6 +6,7 @@ import time
 import os
 
 
+
 class Analyzer:
 
     def __init__(self, content):
@@ -109,9 +110,9 @@ class Analyzer:
         for attempt in range(max_retries + 1):
             try:
                 response = self.client.responses.create(
-                    model="c",
+                    model="llama-3.3-70b-versatile",
                     instructions=instructions,
-                    input=input_json,
+                    input=input_json
                 )
                 return self._parse_response(response)
 

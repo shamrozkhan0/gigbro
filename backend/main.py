@@ -3,6 +3,7 @@ from entity.authentication import LoginUser, SignupUser
 from fastapi.middleware.cors import CORSMiddleware
 from services.jwt_token import verify_jwt
 from database.database import Database
+from database import database_utils
 from ai.analyzer import Analyzer
 from dotenv import load_dotenv
 from pydantic import BaseModel
@@ -78,6 +79,7 @@ def save_content(data: Data, jwt_token: str = Cookie()):
     user = verify_jwt(jwt_token)
     db = Database()
     result = db.setContent(data, user["user"])
+    print(result)
     return {"success": True, "message": "Save successfully", "content_id": result["content_id"], "user_id": result["user_id"]}
 
 
@@ -86,29 +88,45 @@ class ContentRequest(BaseModel):
     content_id:int
 
 @app.get("/getcontent/{user_id}/{content_id}")
-def get_content(user_id:int, content_id:int,jwt_token=Cookie(...)):
+def get_content(user_id:int, content_id:int, jwt_token=Cookie(...)):
     email = verify_jwt(jwt_token)
-    print(f"getting content call by {email['email']}")
     request = ContentRequest(user_id=user_id, content_id=content_id)
     db = Database()
-    content = db.get_content_by_id(request.user_id, request.content_id,email["email"])
-    print("calling response")
+    content = db.get_content_by_id(request.user_id, request.content_id,email["user"]["email"])
     a = Analyzer(content["message"])
     result = a.get_response()
+    db = Database()
+    conn = db._connect_with_database()
+    username = database_utils.get_username_by_id(conn, "user", user_id  )
+    db.save_report(username=username, title=content["message"]["title"], report=result)
     return result
 
 
-@app.get("/dasboard/{username}")
-def getUserDashboard(username: str, jwt:str = Cookie()):
-    ...
+@app.get("/{username}/getprojects")
+def get_projects(username: str, token = Cookie(...)):
+    print("username",username)
+    if not verify_jwt(token):
+        print("kewkdjoweokp")
+        HTTPException(status_code=404, detail="User not Login")
+    db = Database()
+    reports = db.get_reports_by_username(username)
+    print("njweieowkopqkw")
+    return {
+        "success" : True,
+        "message" : reports
+    }
 
 
+
+# @app.get("/dasboard/{username}")
+# def getUserDashboard(username: str, jwt:str = Cookie()):
+#     ...
 
 
 
 # ==================== For testing =====================
 @app.get("/get")
-def analyze():
+def analyze(jwt = Cookie(...)):
     query = f""" SELECT * FROM data"""
     db = Database()
     conn = db._connect_with_database()
@@ -116,7 +134,20 @@ def analyze():
        with conn.cursor(pymysql.cursors.DictCursor) as cursor:
            cursor.execute(query)
            content = cursor.fetchall()
-           print(content)
            return content
+    except pymysql.Error as e:
+        print(e)
+
+
+@app.get("/getreports")
+def getReport():
+    query = f""" SELECT * FROM reports """
+    db = Database()
+    conn = db._connect_with_database()
+    try:
+        with conn.cursor(pymysql.cursors.DictCursor) as cursor:
+            cursor.execute(query)
+            content = cursor.fetchall()
+            return content
     except pymysql.Error as e:
         print(e)
