@@ -4,6 +4,7 @@ import Signup from "./components/signup.jsx"
 import Analyzer from './components/analyzer.jsx'
 import Login from "./components/login.jsx"
 import Auth from "./layouts/auth"
+import AuditReport from "./components/Audit-report.jsx"
 
 import './App.css'
 
@@ -17,6 +18,8 @@ function App() {
           {/* <Route path="/" element={<Editor />} /> */}
           
           <Route path="/" element={<Analyzer />} />
+          <Route path="/audit-repport" element={<AuditReport />} />
+
 
 
 
