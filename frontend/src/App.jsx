@@ -4,12 +4,16 @@ import Signup from "./components/signup.jsx"
 import Analyzer from './components/analyzer.jsx'
 import Login from "./components/login.jsx"
 import Auth from "./layouts/auth"
-import AuditReport from "./components/Audit-report.jsx"
 
 import './App.css'
 
 
 function App() {
+  const { isAuthenticated, user } = useAuth();
+  console.log("ProtectedRoute", {
+  isAuthenticated,
+  user,
+});
   return (
     <>
       <BrowserRouter>
@@ -18,8 +22,6 @@ function App() {
           {/* <Route path="/" element={<Editor />} /> */}
           
           <Route path="/" element={<Analyzer />} />
-          <Route path="/audit-repport" element={<AuditReport />} />
-
 
 
 
@@ -27,11 +29,16 @@ function App() {
             <Route path="/login" element={<Login />} />
             <Route path="/signup" element={<Signup />} />
           </Route>
+
+          {/* Private routes only accessable when user is authenticated */}
+          <Route element={<ProtectedRoutes/>}>
+            <Route path="/dashboard" element={<Dashboard/>} />
+          </Route>
+
         </Routes>
       </BrowserRouter>
     </>
-
   )
 }
 
-export default App
+export default App;
