@@ -38,6 +38,12 @@ const scrapperHTML = `
 
 
 async function senddata(data) {
+  if (!data){
+    return showModal("The layout is not suppoerted by gigbro", false)
+  }
+
+  console.log("let see if it return or not")
+
   const BACKEND_SAVE_DATA_URL = "http://localhost:8000/savecontent"
 
   const response = await fetch(BACKEND_SAVE_DATA_URL, {
@@ -63,6 +69,13 @@ async function senddata(data) {
     })
 
   })
+
+  if (!response.ok){
+    showModal("Something went Wrong", false)
+  }
+
+  showModal("Successfully Fetched the content", true)
+
 }
 
 chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
@@ -74,21 +87,23 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
 
 
 
-function showModal(message, isSucess) {
-  const modal = document.querySelector("div.alert-modal")
-  if (isSucess) {
-    modal.classList.remove("d-none")
-    modal.classList.add("message")
-    modal.querySelector("p.alert-modal-text").textContent = message
-  } else {
-    console.log("modal show red")
-  }
+function showModal(message, isSuccess) {
+    const modal = document.querySelector(".alert-modal");
+    const text = modal.querySelector("p.alert-modal-text");
+    modal.classList.remove("d-none", "success", "error");
 
-  setTimeout(() => {
-    modal.classList.add("d-none")
-    modal.classList.remove("message")
-    return true
-  }, 3200)
+    if (isSuccess) {
+        text.classList.add("success");
+    } else {
+        text.classList.add("error");
+    }
+
+    text.textContent = message;
+
+    setTimeout(() => {
+        modal.classList.add("d-none");
+        modal.classList.remove("success", "error");
+    }, 3200);
 }
 
 
@@ -105,9 +120,6 @@ async function isFiverTab() {
   }).then(res => res.ok ? true : false).catch(err => {
     console.error(err)
   });
-
-  console.log("login:", isLoggedIn)
-
 
   if (isLoggedIn) {
     if (url) {
@@ -131,7 +143,6 @@ async function logout() {
     method: "POST",
     credentials: "include"
   });
-  console.log("logout completed")
   showLogin()
 
 }
@@ -165,23 +176,22 @@ const showScrapper = () => {
 
   container.innerHTML = scrapperHTML;
 
-  // document.getElementById("btn").addEventListener("click", async () => {
-  //   try {
-  //     console.log("button is clicked")
-  //     const [tab] = await chrome.tabs.query({
-  //       active: true,
-  //       currentWindow: true
-  //     });
+  document.getElementById("btn").addEventListener("click", async () => {
+    try {
+      const [tab] = await chrome.tabs.query({
+        active: true,
+        currentWindow: true
+      });
 
-  //     await chrome.scripting.executeScript({
-  //       target: { tabId: tab.id },
-  //       files: ["dist/scrapper.js"]
-  //     })
-  //   }
+      await chrome.scripting.executeScript({
+        target: { tabId: tab.id },
+        files: ["dist/scrapper.js"]
+      })
+    }
 
-  //   catch (error) {
-  //     console.error("Error: ", error)
-  //   }
+    catch (error) {
+      console.error("Error: ", error)
+    }
 
   // console.log("content is scrapped", isScrapped)
   // if (isScrapped.status){
@@ -191,7 +201,7 @@ const showScrapper = () => {
   //   //  chrome.tabs.create({ url: url }); 
   //  },3200)
   // }
-  // });
+  });
 
   // Logout Button
   document.getElementById("logout").addEventListener("click", () => {
@@ -200,62 +210,62 @@ const showScrapper = () => {
 
 
 
-  const btn = document.getElementById('btn');
-  const logoutBtn = document.getElementById('logout');
-  const bar = document.getElementById('bar');
-  const output = document.getElementById('output');
-  const subtext = document.getElementById('subtext');
-  const iconCircle = document.getElementById('iconCircle');
-  const iconBlanket = document.querySelector(".icon-blanket")
+  // const btn = document.getElementById('btn');
+  // const logoutBtn = document.getElementById('logout');
+  // const bar = document.getElementById('bar');
+  // const output = document.getElementById('output');
+  // const subtext = document.getElementById('subtext');
+  // const iconCircle = document.getElementById('iconCircle');
+  // const iconBlanket = document.querySelector(".icon-blanket")
 
-  let scraping = false;
+  // let scraping = false;
 
-  function resetUI() {
-    bar.style.width = '0%';
-    output.textContent = 'Click the scrapp button to scrap the gig';
-    subtext.textContent = '';
-    iconCircle.classList.remove('show');
-    iconBlanket.classList.remove("show");
-  }
+  // function resetUI() {
+  //   bar.style.width = '0%';
+  //   output.textContent = 'Click the scrapp button to scrap the gig';
+  //   subtext.textContent = '';
+  //   iconCircle.classList.remove('show');
+  //   iconBlanket.classList.remove("show");
+  // }
 
-  btn.addEventListener('click', () => {
-    if (scraping) return;
-    scraping = true;
+  // btn.addEventListener('click', () => {
+  //   if (scraping) return;
+  //   scraping = true;
 
-    btn.disabled = true;
-    btn.textContent = 'Scrapping...';
-    iconCircle.classList.remove('show');
-    iconBlanket.classList.remove("show");
-    output.textContent = 'Scraping in progress...';
-    subtext.textContent = '';
-    bar.style.width = '0%';
+  //   btn.disabled = true;
+  //   btn.textContent = 'Scrapping...';
+  //   iconCircle.classList.remove('show');
+  //   iconBlanket.classList.remove("show");
+  //   output.textContent = 'Scraping in progress...';
+  //   subtext.textContent = '';
+  //   bar.style.width = '0%';
 
-    let progress = 0;
-    const interval = setInterval(() => {
-      progress += Math.random() * 18 + 7;
-      if (progress >= 100) {
-        progress = 100;
-        clearInterval(interval);
+  //   let progress = 0;
+  //   const interval = setInterval(() => {
+  //     progress += Math.random() * 18 + 7;
+  //     if (progress >= 100) {
+  //       progress = 100;
+  //       clearInterval(interval);
 
-        bar.style.width = '100%';
-        output.textContent = 'Gig Scraped Successfully!';
-        subtext.textContent = 'Redirecting for analysis...';
-        iconCircle.classList.add('show');
-        iconBlanket.classList.add('show');
+  //       bar.style.width = '100%';
+  //       output.textContent = 'Gig Scraped Successfully!';
+  //       subtext.textContent = 'Redirecting for analysis...';
+  //       iconCircle.classList.add('show');
+  //       iconBlanket.classList.add('show');
 
-        btn.disabled = false;
-        btn.textContent = 'Start Scrapping';
-        scraping = false;
-      } else {
-        bar.style.width = progress + '%';
-      }
-    }, 250);
+  //       btn.disabled = false;
+  //       btn.textContent = 'Start Scrapping';
+  //       scraping = false;
+  //     } else {
+  //       bar.style.width = progress + '%';
+  //     }
+  //   }, 250);
 
-    setTimeout(() => {
-        chrome.tabs.create({ url: WEB_URL + "dashboard" });
-    }, 500);
+  //   setTimeout(() => {
+  //       chrome.tabs.create({ url: WEB_URL + "dashboard" });
+  //   }, 500);
 
-  });
+  // });
 
 
 

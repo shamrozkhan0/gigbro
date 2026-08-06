@@ -32,7 +32,7 @@ const Signup = () => {
 
 
     const data = await response.json()
-    console.log(data)
+    console.log("data", data)
 
     showNotification({
       success: data.success,
@@ -83,6 +83,7 @@ const Signup = () => {
               onChange={handleChange}
               maxLength={15}
               placeholder="Choose a username"
+              required
               className="w-full rounded-xl border border-gray-300 px-4 py-3 text-sm text-gray-700 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 transition"
             />
           </div>
@@ -107,6 +108,7 @@ const Signup = () => {
               onChange={handleChange}
               maxLength={50}
               placeholder="Enter your email"
+              required
               className="w-full rounded-xl border border-gray-300 px-4 py-3 text-sm text-gray-700 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 transition"
             />
           </div>
@@ -131,6 +133,7 @@ const Signup = () => {
               onChange={handleChange}
               maxLength={20}
               placeholder="Enter your password"
+              required
               className="w-full rounded-xl border border-gray-300 px-4 py-3 text-sm text-gray-700 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 transition"
             />
           </div>

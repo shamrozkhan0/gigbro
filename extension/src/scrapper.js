@@ -31,14 +31,21 @@ function scrapper() {
         gig_url: getGigUrl(),
         seller_status: getProfileStatus()
     }
+
+    if (
+        (data.title === null) &&
+        (data.gig_description === null) &&
+        (data.gig_category === null)
+    ){
+        return false
+    } 
+
     return data
 }
 
 
-
 (() => {
     const data = scrapper();
-    console.log("data:", data);
     chrome.runtime.sendMessage({
         type: "SCRAPPED_DATA",
         data

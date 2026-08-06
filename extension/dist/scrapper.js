@@ -666,19 +666,17 @@
   var emptyMessage = "Not Found in the Gig";
   function getTitle() {
     const titleElement = document.querySelector("div.gig-overview h1");
-    if (!titleElement) return emptyMessage;
-    console.log("Title Done");
+    if (!titleElement) return null;
     return titleElement.textContent.trim().toLowerCase().replace("i will", "").trim();
   }
   function getDescription() {
     const description = document.querySelector("div.description-wrapper div.description-content") || document.querySelector("div.about-gig div.m2d0eb1cs");
-    if (!description) return emptyMessage;
-    console.log("Description Done");
+    if (!description) return null;
     return convertmd.turndown(description.innerHTML).trim().replace(/\s+/g, " ");
   }
   function getCategoryAndSubcategory() {
     const breadcrumbElement = document.querySelector("ol.m2d0eb0");
-    if (!breadcrumbElement) return emptyMessage;
+    if (!breadcrumbElement) return null;
     return breadcrumbElement.textContent.replaceAll("/", ">").trim();
   }
   function getExpertise() {
@@ -686,6 +684,7 @@
     let expertiesJson = [];
     if (expertiesElement) {
       const finalExpertiesElement = expertiesElement.querySelectorAll("li.metadata-attribute");
+      if (!finalExpertiesElement) return emptyMessage;
       finalExpertiesElement.forEach((el) => {
         const title = el.querySelector("p")?.textContent?.trim().replace(/\s+/g, " ");
         const items = [...el.querySelectorAll("ul li")].map(
@@ -699,7 +698,6 @@
         }
       });
     }
-    console.log("Expertise Done");
     return expertiesJson;
   }
   function getPackage() {
@@ -707,7 +705,7 @@
     const packages = {};
     try {
       packageTabs.forEach((tab) => {
-        if (!tab) return;
+        if (!tab) return emptyMessage;
         tab.click();
         const content = document.querySelector("div.packages-tabs div.package-content");
         const content_revisions = content.querySelector("div.additional-info div.revisions-wrapper b.revisions");
@@ -726,21 +724,19 @@
     const item = document.querySelector(".collapsable-package-item");
     const header = item?.querySelector(".collapsable-header");
     if (item?.classList.contains("collapsed") || header?.classList.contains("collapsed")) {
-      console.log("Section is closed \u2192 opening");
       header?.click();
     }
-    console.log("Package Done");
     return packages;
   }
   function getSellerProfile() {
     const profileElement = document.querySelector("article.seller-desc div.inner");
-    console.log("Seller Profile Done");
+    if (!profileElement) return emptyMessage;
     return convertmd.turndown(profileElement.textContent.trim());
   }
   function getTags() {
     const tagsElement = document.querySelector("div.gig-tags-container ul");
+    if (!tagsElement) return emptyMessage;
     const tags = [...tagsElement.querySelectorAll(" li")].map((tag) => tag.innerText.trim()).join(", ");
-    console.log("Tags Done");
     return tags;
   }
   function getRatings() {
@@ -752,13 +748,11 @@
       let value = rating.querySelector("span").textContent.trim();
       rating_json.push({ [key]: parseFloat(value) });
     });
-    console.log("Ratings Done");
     return rating_json;
   }
   function getTotalOrders() {
     const totalReviewsElement = document.querySelector("header.reviews-header div.details span._1fe1trbk span");
     if (!totalReviewsElement) return 0;
-    console.log("Total Orders Done");
     return parseInt(totalReviewsElement.textContent.trim().replace(",", "").trim());
   }
   function getStarsReviews() {
@@ -768,7 +762,6 @@
     reviewsPerStar.forEach((el) => {
       starReviews[el.querySelector("span.stars-filter-wrapper").innerText.trim()] = el.querySelector("td.star-num").innerText.trim();
     });
-    console.log("Starts Reviews Done");
     return starReviews;
   }
   function getSellerInfo() {
@@ -781,20 +774,17 @@
       const key = el.querySelector("p")?.innerText.trim() || el.textContent.replace(strong.textContent, "").trim();
       sellerInfo[key] = strong.textContent.trim();
     });
-    console.log("Seller Information Done");
     return sellerInfo;
   }
   function getGigUrl() {
     const url = new URL(window.location.href);
     url.search = "";
-    console.log("GigUrl Done");
     return url.toString();
   }
   function getProfileStatus() {
     ``;
     const status = document.querySelector("div.seller-overview p.m2d0eb2");
     if (!status) return "fresher";
-    console.log("Profile Level Done");
     return status.textContent.trim();
   }
 
@@ -816,11 +806,13 @@
       gig_url: getGigUrl(),
       seller_status: getProfileStatus()
     };
+    if (data.title === null && data.gig_description === null && data.gig_category === null) {
+      return false;
+    }
     return data;
   }
   (() => {
     const data = scrapper();
-    console.log("data:", data);
     chrome.runtime.sendMessage({
       type: "SCRAPPED_DATA",
       data

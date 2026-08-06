@@ -3,18 +3,13 @@ import ProtectedRoutes from "./Routes/ProtectedRoutes.jsx"
 import LandingPage from "./pages/LandingPage.jsx"
 import Dashboard from "./pages/Dashboard.jsx"
 import Signup from "./components/Signup.jsx"
+import NotFound from "./pages/NotFound.jsx"
 import Login from "./components/Login.jsx"
 import Auth from "./pages/Auth.jsx"
 import "./App.css"
-import NotFound from "./pages/NotFound.jsx"
-import { useAuth } from "./context/AuthContext.jsx" 
+import FullReport from "./components/reportTemplate/FullReport.jsx"
 
 function App() {
-  const { isAuthenticated, user } = useAuth();
-  console.log("ProtectedRoute", {
-  isAuthenticated,
-  user,
-});
   return (
     <>
       <BrowserRouter>
@@ -23,6 +18,7 @@ function App() {
           <Route path="/" element={<LandingPage />} />
           <Route path="/dashboarddemo" element={<Dashboard/>} />
           <Route path="*" element={<NotFound/>}/> 
+          <Route path="/report" element={<FullReport/>}/>
           
           {/* Authentication Routes contains Login and Signup pages */}
           <Route element={<Auth/>}>

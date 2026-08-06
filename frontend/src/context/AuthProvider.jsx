@@ -5,7 +5,6 @@ const AuthProvider = ({ children }) => {
     const [isAuthenticated, setIsAuthenticated] = useState(false);
     const [loading, setLoading] = useState(true);
     const [user, setUser] = useState(null);
-
     const AUTH_URL = `${import.meta.env.VITE_BACKEND_URL}me`;
 
     const checkAuthentication = useCallback(async () => {

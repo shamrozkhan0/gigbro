@@ -1,6 +1,4 @@
 const Notification = ({ show, success, message }) => {
-  console.log("success", success)
-  console.log("message", message)
   return (
     <div
       className={`fixed top-5 right-5 z-50 transition-all duration-300 ease-in-out ${

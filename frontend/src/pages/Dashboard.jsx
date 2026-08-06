@@ -1,7 +1,7 @@
 import DashboardAnalyzeGig from "../images/dashboard-analyze-gig.png"
 import { useAuth } from "../context/AuthContext";
 import { useNavigate } from "react-router-dom";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import GigBroLogo from "../images/logo.png";
 import { logout } from "../utils/logout.js";
 
@@ -12,55 +12,16 @@ import {
   MoreVertical,
   Crown,
   Info,
+  Columns3Cog,
 } from "lucide-react";
 
+const randomColor = [
+  "bg-purple-100 text-purple-600",
+  "bg-orange-100 text-orange-600",
+  "bg-purple-100 text-purple-600",
+  "bg-green-100 text-green-700",
+]
 
-// const projects = [
-//   {
-//     id: 1,
-//     name: "WordPress Website Development",
-//     category: "Web Development",
-//     initial: "W",
-//     color: "bg-green-100 text-green-700",
-//     score: 78,
-//     type: "Pro Analysis",
-//     typeColor: "bg-purple-100 text-purple-600",
-//     lastAnalyzed: "2 days ago",
-//   },
-//   {
-//     id: 2,
-//     name: "Shopify Store Design & Redesign",
-//     category: "E-Commerce",
-//     initial: "S",
-//     color: "bg-orange-100 text-orange-600",
-//     score: 65,
-//     type: "Lite Report",
-//     typeColor: "bg-green-100 text-green-700",
-//     lastAnalyzed: "5 days ago",
-//   },
-//   {
-//     id: 3,
-//     name: "SEO Backlinks for Website",
-//     category: "Digital Marketing",
-//     initial: "S",
-//     color: "bg-blue-100 text-blue-600",
-//     score: 82,
-//     type: "Pro Analysis",
-//     typeColor: "bg-purple-100 text-purple-600",
-//     lastAnalyzed: "1 week ago",
-//   },
-//   {
-//     id: 4,
-//     name: "Landing Page Design in Figma",
-//     category: "Graphics & Design",
-//     initial: "L",
-//     color: "bg-purple-100 text-purple-600",
-//     score: 58,
-//     type: "Lite Report",
-//     typeColor: "bg-green-100 text-green-700",
-//     lastAnalyzed: "1 week ago",
-//   },
-// ];
 
 const scoreColor = (score) => {
   if (score >= 75) return "bg-green-100 text-green-700";
@@ -77,12 +38,9 @@ const navItems = [
 ];
 
 const Dashboard = () => {
-  const {isAuthenticated, setIsAuthenticated, user, setUser} = useAuth()
+  const {setIsAuthenticated, user, setUser } = useAuth()
   const BACKEND_URL = import.meta.env.VITE_BACKEND_URL
   const [reports, setReports] = useState([])
-  
-
-  console.log(user)
 
   const [menuOpen, setMenuOpen] = useState(false);
   const navigate = useNavigate()
@@ -102,6 +60,37 @@ const Dashboard = () => {
     }
   }
 
+
+useEffect(() => {
+  if (!user?.username) return;
+
+  const getDashboardReports = async () => {
+    try {
+      const response = await fetch(
+        `${BACKEND_URL}${user.username}/getprojects`,
+        {
+          credentials: "include",
+        }
+      );
+
+      const data = await response.json();
+
+      const reports = data.message.map(report => ({
+        ...report,
+        color: randomColor[Math.floor(Math.random() * randomColor.length)]
+      }))
+   
+      setReports(reports)
+    }
+     catch (err) {
+      console.error("Error: ",err);
+    }
+  };
+
+  getDashboardReports();
+}, [user?.username]);
+
+console.log(reports)
 
 
   return (
@@ -220,42 +209,42 @@ const Dashboard = () => {
 
           <div className="flex items-center gap-2">
             <div className="flex items-center gap-2 rounded-full border border-gray-100 bg-gray-50 px-4 py-2 text-sm">
-            <span className="flex items-center gap-1.5">
-              <span className="h-2 w-2 rounded-full bg-fiver-green" />
-              Lite: {liteLimit - liteUsed} left
-            </span>
-            <span className="text-gray-300">|</span>
-            <span className="flex items-center gap-1.5">
-              <span className="h-2 w-2 rounded-full bg-purple-500" />
-              Pro: {proLimit - proUsed} left
-            </span>
-          </div>
+              <span className="flex items-center gap-1.5">
+                <span className="h-2 w-2 rounded-full bg-fiver-green" />
+                Lite: {liteLimit - liteUsed} left
+              </span>
+              <span className="text-gray-300">|</span>
+              <span className="flex items-center gap-1.5">
+                <span className="h-2 w-2 rounded-full bg-purple-500" />
+                Pro: {proLimit - proUsed} left
+              </span>
+            </div>
 
-          <div className="relative">
-            <button
-              onClick={() => setMenuOpen((v) => !v)}
-              className="flex items-center gap-1.5"
-            >
-              <div className="h-9 w-9 overflow-hidden rounded-full bg-gray-200" />
-              <ChevronDown size={16} className="text-gray-500" />
-            </button>
+            <div className="relative">
+              <button
+                onClick={() => setMenuOpen((v) => !v)}
+                className="flex items-center gap-1.5"
+              >
+                <div className="h-9 w-9 overflow-hidden rounded-full bg-gray-200" />
+                <ChevronDown size={16} className="text-gray-500" />
+              </button>
 
-            {menuOpen && (
-              <div className="absolute right-0 top-12 w-48 rounded-xl border border-gray-100 bg-white p-2 shadow-lg">
-                {/* <button className="flex w-full items-center gap-2.5 rounded-lg px-3 py-2 text-sm text-gray-700 hover:bg-gray-50">
+              {menuOpen && (
+                <div className="absolute right-0 top-12 w-48 rounded-xl border border-gray-100 bg-white p-2 shadow-lg">
+                  {/* <button className="flex w-full items-center gap-2.5 rounded-lg px-3 py-2 text-sm text-gray-700 hover:bg-gray-50">
                   <User size={16} /> Profile
                 </button>
                 <button className="flex w-full items-center gap-2.5 rounded-lg px-3 py-2 text-sm text-gray-700 hover:bg-gray-50">
                   <SettingsIcon size={16} /> Settings
                 </button> */}
-                <button
-                  onClick={e => handleLogout()}
-                  className="flex w-full items-center gap-2.5 rounded-lg px-3 py-2 text-sm text-red-500 hover:bg-red-50">
-                  <LogOut size={16} /> Logout
-                </button>
-              </div>
-            )}
-          </div>
+                  <button
+                    onClick={e => handleLogout()}
+                    className="flex w-full items-center gap-2.5 rounded-lg px-3 py-2 text-sm text-red-500 hover:bg-red-50">
+                    <LogOut size={16} /> Logout
+                  </button>
+                </div>
+              )}
+            </div>
           </div>
 
         </div>
@@ -306,42 +295,42 @@ const Dashboard = () => {
               </thead>
               <tbody>
                 {reports.map((p) => (
-                  <tr key={p.id} className="border-t border-gray-50">
+                  <tr key={p[0]} className="border-t border-gray-50">
                     <td className="px-6 py-4">
                       <div className="flex items-center gap-3">
                         <div
-                          className={`flex h-10 w-10 items-center justify-center rounded-xl font-semibold ${p.color}`}
+                          className={`flex h-10 w-10 items-center justify-center rounded-xl font-semibold ${p["color"]} `}
                         >
-                          {p.initial}
+                          {p[1][0]}
                         </div>
                         <div>
                           <p className="font-semibold text-gray-800">
-                            {p.name}
+                            {p[1]}
                           </p>
                           <p className="text-xs text-gray-400">
-                            {p.category}
+                            {p[3]}
                           </p>
                         </div>
                       </div>
                     </td>
-                    <td className="px-6 py-4">
+                    <td className=" py-4">
                       <span
                         className={`rounded-lg px-2.5 py-1 text-xs font-semibold ${scoreColor(
-                          p.score
+                          p[2]
                         )}`}
                       >
-                        {p.score} / 100
+                        {p[2]} / 100
                       </span>
                     </td>
                     <td className="px-6 py-4">
                       <span
                         className={`rounded-full px-3 py-1 text-xs font-semibold ${p.typeColor}`}
                       >
-                        {p.type}
+                        {p[3]}
                       </span>
                     </td>
                     <td className="px-6 py-4 text-gray-500">
-                      {p.lastAnalyzed}
+                      {p[4]}
                     </td>
                     <td className="px-6 py-4">
                       <button className="text-gray-400 hover:text-gray-700">

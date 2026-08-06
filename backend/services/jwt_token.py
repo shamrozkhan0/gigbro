@@ -20,12 +20,12 @@ def create_token(email:str, username:str, is_premium_user):
         "email": email,
         "username": username,
         "is_premium_user": is_premium_user,
-        "exp": datetime.datetime.now(datetime.timezone.utc) + datetime.timedelta(hours=1)
+        "exp": datetime.datetime.now(datetime.timezone.utc) + datetime.timedelta(days=1)
     }
 
     try:
         jwt_token = jwt.encode(pay_load, secret_key, algorithm=algorithm)
-        log.info(f"| Success JWT token successfully created for user with email: {email} {jwt_token}")
+        log.info(f"| Success JWT token successfully created for user with email: {email}")
         return jwt_token
     except jwt.PyJWKError as e:
         log.error(f"| Error creating JWT token:  {e}")
@@ -35,7 +35,6 @@ def verify_jwt(jwt_token: str):
     try:
         log.info("verifying jwt token")
         user = jwt.decode(jwt=jwt_token, key=os.getenv("JWT_SECRET_KEY"), algorithms=os.getenv("JWT_ALGORITHM"))
-        print(user)
         return {"success": True, "user": user}
     except ExpiredSignatureError as e:
         log.error(f"| Error: {e}")

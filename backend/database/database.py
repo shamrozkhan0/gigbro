@@ -55,6 +55,16 @@ class Database:
                     cursor.execute(create_table_query)
                     log.info(f"| Success: created '{self.auth_table_name}' table in the database.")
 
+                print("len of username", len(user.username))
+                print("len of username", len(user.email))
+                print("len of username", len(user.password))
+
+                if (not user.username) or (not user.email) or (not user.password):
+                    return {
+                        "success" : False,
+                        "message" : "Fill All Credentials first"
+                    }
+
                 if database_utils.check_if_user_exist_by_email(self.auth_table_name, database_connection, user.email):
                     return {
                         "success": False,
@@ -236,15 +246,20 @@ class Database:
             report_id INT PRIMARY KEY AUTO_INCREMENT,
             username VARCHAR(15) NOT NULL,
             title VARCHAR(255) NOT NULL,
-            report json,
+            report LONGTEXT,
+            score INT NOT NULL,
+            type VARCHAR(40) NOT NULL,
+            analyzed_at DATE NOT NULL DEFAULT (CURRENT_DATE),
             FOREIGN KEY (username) REFERENCES `user`(username)
         )
         """
         insert_report_query = f""" INSERT INTO {self.report_table_name} (
             username,
             title,
-            report
-        )  VALUES (%s, %s, %s)"""
+            report,
+            score,
+            type
+        )  VALUES (%s, %s, %s, %s,%s)"""
 
         try:
             conn = self._connect_with_database()
@@ -254,21 +269,33 @@ class Database:
                     cursor.execute(create_report_table_query)
                     log.info(f"| Success: Created schema '{self.report_table_name}'. ")
                     conn.commit()
-                cursor.execute(insert_report_query, (username, title, json.dumps(report)))
+                gig_score = report["scores"]["overall"]["score"]
+                # gig_score = 34
+                print("score", gig_score)
+                gig_type = report["meta"]["subcategory"].split(">")[-1]
+                # gig_type = "wordpress"
+                print("gigtype", gig_type)
+                cursor.execute(insert_report_query, (username, title, json.dumps(report), gig_score, gig_type))
                 conn.commit()
         except pymysql.Error as e:
             log.error(f"| Error: {e}")
 
+        finally:
+            conn.close()
 
-    def get_reports_by_username(self, username):
-        query = f""" SELECT resport_id, title FROM {self.report_table_name} WHERE username = %s """
+    def get_reports_info_by_username(self, username):
+        query = f""" SELECT report_id, title, score, type, analyzed_at FROM {self.report_table_name} WHERE username = %s """
         try:
             conn = self._connect_with_database()
             with conn.cursor() as cursor:
                 cursor.execute(query, (username,))
-                return cursor.fetchall()
+                reports = cursor.fetchall()
+                return reports
         except pymysql.Error as e:
             log.error(f"| Error: {e}")
+        finally:
+            if conn:
+                conn.close()
 
     def save_report_in_database(self):
         ...

@@ -37,10 +37,8 @@ def login_user(user: LoginUser, response: Response):
     log.info("| Reviewed Login request")
     db = Database()
     result = db.verify_user(user)
-    print("result:", result)
 
     if result["success"] == False:
-        print(result)
         return result
 
     response.set_cookie(
@@ -57,7 +55,6 @@ def login_user(user: LoginUser, response: Response):
 
 @app.get("/me")
 def get_me(jwt_token: str = Cookie(None)):
-    log.info(f"| me alert {jwt_token}")
     if not jwt_token:
         log.error("| Error jwt token not found")
         raise HTTPException(401, "Not authenticated")
@@ -79,7 +76,6 @@ def save_content(data: Data, jwt_token: str = Cookie()):
     user = verify_jwt(jwt_token)
     db = Database()
     result = db.setContent(data, user["user"])
-    print(result)
     return {"success": True, "message": "Save successfully", "content_id": result["content_id"], "user_id": result["user_id"]}
 
 
@@ -94,23 +90,21 @@ def get_content(user_id:int, content_id:int, jwt_token=Cookie(...)):
     db = Database()
     content = db.get_content_by_id(request.user_id, request.content_id,email["user"]["email"])
     a = Analyzer(content["message"])
-    result = a.get_response()
+    result= a.get_response()
     db = Database()
     conn = db._connect_with_database()
     username = database_utils.get_username_by_id(conn, "user", user_id  )
+    conn.close()
     db.save_report(username=username, title=content["message"]["title"], report=result)
     return result
 
 
 @app.get("/{username}/getprojects")
-def get_projects(username: str, token = Cookie(...)):
-    print("username",username)
-    if not verify_jwt(token):
-        print("kewkdjoweokp")
+def get_projects(username: str, jwt_token=Cookie(...)):
+    if not verify_jwt(jwt_token):
         HTTPException(status_code=404, detail="User not Login")
     db = Database()
-    reports = db.get_reports_by_username(username)
-    print("njweieowkopqkw")
+    reports = db.get_reports_info_by_username(username)
     return {
         "success" : True,
         "message" : reports
@@ -126,7 +120,7 @@ def get_projects(username: str, token = Cookie(...)):
 
 # ==================== For testing =====================
 @app.get("/get")
-def analyze(jwt = Cookie(...)):
+def analyze():
     query = f""" SELECT * FROM data"""
     db = Database()
     conn = db._connect_with_database()
@@ -136,7 +130,7 @@ def analyze(jwt = Cookie(...)):
            content = cursor.fetchall()
            return content
     except pymysql.Error as e:
-        print(e)
+        log.error(f"| Error: {e}")
 
 
 @app.get("/getreports")
@@ -150,4 +144,4 @@ def getReport():
             content = cursor.fetchall()
             return content
     except pymysql.Error as e:
-        print(e)
+        log.error(f"| Error: {e}")
