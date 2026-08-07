@@ -1,0 +1,28 @@
+# GigBro
+
+> GigBro is an AI-powered Fiverr gig analyzer that helps freelancers analyze and optimize their Fiverr gigs for better SEO, titles, descriptions, tags, and overall performance.
+
+## What GigBro Does
+
+GigBro helps Fiverr freelancers improve their gigs using AI-powered analysis and recommendations.
+
+## Main Features
+
+- Analyze Fiverr gigs
+- Analyze Fiverr SEO
+- Optimize gig titles
+- Optimize gig descriptions
+- Analyze Fiverr tags
+- Generate recommendations for improving gig performance
+- Generate optimized Fiverr gig content
+
+## Important Pages
+
+- [GigBro Homepage](https://gigbro.pages.dev/)
+- [GigBro Pricing](https://gigbro.pages.dev/pricing)
+- [GigBro Features](https://gigbro.pages.dev/features)
+- [How It Works](https://gigbro.pages.dev/#how-it-works)
+
+## Product
+
+GigBro is designed for freelancers who want to improve the visibility and quality of their Fiverr gigs using AI.
