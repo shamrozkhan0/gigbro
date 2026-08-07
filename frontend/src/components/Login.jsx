@@ -5,7 +5,7 @@ import { useState } from "react"
 import { useAuth } from "../context/AuthContext";
 
 const Login = () => {
-  const {setIsAuthenticated, setUser, setLoading, checkAuthentication} = useAuth()
+  const {checkAuthentication} = useAuth()
   const logniURL = import.meta.env.VITE_BACKEND_URL + "login"
   console.log(GigBroLogo)
   const { showNotification } = useNotification()

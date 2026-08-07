@@ -1,4 +1,5 @@
-import React from "react";
+import { useParams } from "react-router-dom";
+
 import {
   LayoutDashboard,
   History,
@@ -26,6 +27,7 @@ import {
   Heart,
   ThumbsDown,
 } from "lucide-react";
+import { useEffect } from "react";
 
 /* ---------------------------------------------------------- helpers */
 
@@ -33,8 +35,8 @@ const tone = (score) =>
   score >= 70
     ? { ring: "#16a34a", text: "text-emerald-600", chip: "text-emerald-600", label: "Good" }
     : score >= 50
-    ? { ring: "#eab308", text: "text-amber-500", chip: "text-amber-500", label: "Average" }
-    : { ring: "#ef4444", text: "text-red-500", chip: "text-red-500", label: "Poor" };
+      ? { ring: "#eab308", text: "text-amber-500", chip: "text-amber-500", label: "Average" }
+      : { ring: "#ef4444", text: "text-red-500", chip: "text-red-500", label: "Poor" };
 
 const barTone = (score) =>
   score >= 70 ? "bg-emerald-500" : score >= 50 ? "bg-amber-500" : "bg-red-500";
@@ -196,6 +198,18 @@ const navItems = [
 /* ---------------------------------------------------------- component */
 
 export default function FullReport() {
+  const { username, id } = useParams()
+  const BACKEND_URL = `${import.meta.env.VITE_BACKEND_URL}/getdashboard/${username}/${id}`
+
+  useEffect(()=>{
+    async function getDashboard() {
+      const response = await fetch(BACKEND_URL, {
+        "credentials": "include"
+    })
+    }
+  })
+
+
   return (
     <div className="h-screen w-full bg-[#F7F8FA] flex overflow-hidden text-slate-700 font-sans lg:overflow-hidden overflow-y-auto">
       {/* Sidebar */}
@@ -208,9 +222,8 @@ export default function FullReport() {
           {navItems.map((it) => (
             <div
               key={it.label}
-              className={`flex items-center gap-2 px-2.5 py-2 rounded-lg text-[12.5px] cursor-pointer ${
-                it.active ? "bg-emerald-50 text-emerald-600 font-medium" : "text-slate-500 hover:bg-slate-50"
-              }`}
+              className={`flex items-center gap-2 px-2.5 py-2 rounded-lg text-[12.5px] cursor-pointer ${it.active ? "bg-emerald-50 text-emerald-600 font-medium" : "text-slate-500 hover:bg-slate-50"
+                }`}
             >
               <it.icon size={15} />
               {it.label}
@@ -370,9 +383,8 @@ export default function FullReport() {
                         {w.label}
                       </span>
                       <span
-                        className={`shrink-0 text-[8.5px] font-medium px-1.5 py-0.5 rounded-full ${
-                          w.impact === "High Impact" ? "bg-red-50 text-red-500" : "bg-amber-50 text-amber-500"
-                        }`}
+                        className={`shrink-0 text-[8.5px] font-medium px-1.5 py-0.5 rounded-full ${w.impact === "High Impact" ? "bg-red-50 text-red-500" : "bg-amber-50 text-amber-500"
+                          }`}
                       >
                         {w.impact}
                       </span>
@@ -490,9 +502,8 @@ export default function FullReport() {
                   {packages.map((p) => (
                     <div
                       key={p.name}
-                      className={`relative rounded-lg border p-2 flex flex-col items-center ${
-                        p.popular ? "border-emerald-400 bg-emerald-50/40" : "border-slate-100"
-                      }`}
+                      className={`relative rounded-lg border p-2 flex flex-col items-center ${p.popular ? "border-emerald-400 bg-emerald-50/40" : "border-slate-100"
+                        }`}
                     >
                       {p.popular && (
                         <span className="absolute -top-2 bg-emerald-500 text-white text-[7.5px] px-1.5 py-0.5 rounded-full">
@@ -520,9 +531,8 @@ export default function FullReport() {
             {pageNav.map((label, i) => (
               <div
                 key={label}
-                className={`flex items-center gap-1.5 text-[10px] py-0.5 ${
-                  i === 4 ? "text-emerald-600 font-medium" : "text-slate-400"
-                }`}
+                className={`flex items-center gap-1.5 text-[10px] py-0.5 ${i === 4 ? "text-emerald-600 font-medium" : "text-slate-400"
+                  }`}
               >
                 <span className="w-4">{String(i + 1).padStart(2, "0")}</span>
                 {label}

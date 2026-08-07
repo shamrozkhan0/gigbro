@@ -12,7 +12,6 @@ import {
   MoreVertical,
   Crown,
   Info,
-  Columns3Cog,
 } from "lucide-react";
 
 const randomColor = [
@@ -238,7 +237,7 @@ console.log(reports)
                   <SettingsIcon size={16} /> Settings
                 </button> */}
                   <button
-                    onClick={e => handleLogout()}
+                    onClick={() => handleLogout()}
                     className="flex w-full items-center gap-2.5 rounded-lg px-3 py-2 text-sm text-red-500 hover:bg-red-50">
                     <LogOut size={16} /> Logout
                   </button>

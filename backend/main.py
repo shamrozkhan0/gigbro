@@ -88,7 +88,7 @@ def get_content(user_id:int, content_id:int, jwt_token=Cookie(...)):
     email = verify_jwt(jwt_token)
     request = ContentRequest(user_id=user_id, content_id=content_id)
     db = Database()
-    content = db.get_content_by_id(request.user_id, request.content_id,email["user"]["email"])
+    content = db.get_content_by_id(request.user_id, request.content_id, email["user"]["email"])
     a = Analyzer(content["message"])
     result= a.get_response()
     db = Database()
@@ -111,10 +111,11 @@ def get_projects(username: str, jwt_token=Cookie(...)):
     }
 
 
+@app.get("/getdasboard/{username}/{id}")
+def getUserDashboard(username: str, id:int, jwt:str = Cookie()):
+    ...
 
-# @app.get("/dasboard/{username}")
-# def getUserDashboard(username: str, jwt:str = Cookie()):
-#     ...
+
 
 
 
