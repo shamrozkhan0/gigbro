@@ -7,7 +7,8 @@ import NotFound from "./pages/NotFound.jsx"
 import Login from "./components/Login.jsx"
 import Auth from "./pages/Auth.jsx"
 import "./App.css"
-import FullReport from "./components/reportTemplate/FullReport.jsx"
+import Waiting from "./components/Waiting.jsx"
+import GigReport from "./components/reportTemplate/GigReport.jsx"
 
 function App() {
   return (
@@ -18,7 +19,8 @@ function App() {
           <Route path="/" element={<LandingPage />} />
           <Route path="/dashboarddemo" element={<Dashboard/>} />
           <Route path="*" element={<NotFound/>}/> 
-          <Route path="/:username/report/:id" element={<FullReport/>}/>
+          <Route path="/:username/report/:id" element={<GigReport/>}/>
+          <Route path="/wait" element={<Waiting/>}/>
           
           {/* Authentication Routes contains Login and Signup pages */}
           <Route element={<Auth/>}>

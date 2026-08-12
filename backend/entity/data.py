@@ -27,9 +27,9 @@ class Data(BaseModel):
     expertise: list[Expertise]
     category_and_subcategory: str
     packages: dict[str, Package]
-    tags: str
+    tags: str | list[str]
     profile_description: str
     ratings: list[dict[str, float]] | str
     total_orders: int
     gig_stars: dict[str, Any] | str
-    seller_information: dict[str, str]
+    seller_information: dict[str, str] | str

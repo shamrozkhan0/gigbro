@@ -15,7 +15,6 @@ import {
 
 
 function scrapper() {
-    console.log("scrapper runs")
     const data = {
         title : getTitle(),
         gig_description : getDescription(),
@@ -39,7 +38,6 @@ function scrapper() {
     ){
         return false
     } 
-
     return data
 }
 

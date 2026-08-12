@@ -1,4 +1,4 @@
-{
+export const gig_data = {
 "meta": {
 "gig_url": "https://www.fiverr.com/mishaal_mimi/design-redesign-business-wordpress-website-build-wordpress-website-development",
 "analyzed_at": "2024-03-16T14:30:00.000Z",

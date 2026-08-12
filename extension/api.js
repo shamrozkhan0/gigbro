@@ -42,8 +42,6 @@ async function senddata(data) {
     return showModal("The layout is not suppoerted by gigbro", false)
   }
 
-  console.log("let see if it return or not")
-
   const BACKEND_SAVE_DATA_URL = "http://localhost:8000/savecontent"
 
   const response = await fetch(BACKEND_SAVE_DATA_URL, {
@@ -71,12 +69,16 @@ async function senddata(data) {
   })
 
   if (!response.ok){
-    showModal("Something went Wrong", false)
+    return showModal("Something went Wrong", false)
   }
-
   showModal("Successfully Fetched the content", true)
 
+  setTimeout(() => {
+    chrome.tabs.create({ url: WEB_URL + "dashboard" });
+  }, 1000);
+
 }
+
 
 chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
   if (message.type === "SCRAPPED_DATA") {
