@@ -40,6 +40,7 @@ const Dashboard = () => {
   const {setIsAuthenticated, user, setUser } = useAuth()
   const BACKEND_URL = import.meta.env.VITE_BACKEND_URL
   const [reports, setReports] = useState([])
+  console.log(user)
 
   const [menuOpen, setMenuOpen] = useState(false);
   const navigate = useNavigate()
@@ -118,8 +119,6 @@ console.log(reports)
           </nav>
         </div>
 
-
-        {/* Credits card */}
         <div>
           <div className="rounded-2xl border border-gray-100 p-4">
             <div className="mb-3 flex items-center gap-1.5">
@@ -296,14 +295,15 @@ console.log(reports)
                 {reports.map((p) => (
                   <tr key={p[0]} className="border-t border-gray-50">
                     <td className="px-6 py-4">
-                      <div className="flex items-center gap-3">
+                      <a href={`/${user.username}/report/${p[0]}`}>
+                       <div className="flex items-center gap-3">
                         <div
                           className={`flex h-10 w-10 items-center justify-center rounded-xl font-semibold ${p["color"]} `}
                         >
                           {p[1][0]}
                         </div>
                         <div>
-                          <p className="font-semibold text-gray-800">
+                           <p className="font-semibold text-gray-800">
                             {p[1]}
                           </p>
                           <p className="text-xs text-gray-400">
@@ -311,6 +311,7 @@ console.log(reports)
                           </p>
                         </div>
                       </div>
+                      </a>
                     </td>
                     <td className=" py-4">
                       <span

@@ -140,7 +140,7 @@ class Database:
     def setContent(self, data, user):
         table_query = f"""CREATE TABLE {self.data_table_name} (
             content_id INT PRIMARY KEY AUTO_INCREMENT,
-            profile_id INT NOT NULL,
+            username VARCHAR(50) NOT NULL,
             url VARCHAR(150) NOT NULL,
             seller_status VARCHAR(10),
             title VARCHAR(255) NOT NULL,
@@ -153,12 +153,11 @@ class Database:
             ratings JSON,
             total_orders INT,
             gig_stars JSON,
-            about_profile JSON NOT NULL,
-            FOREIGN KEY (profile_id) REFERENCES user(id)
+            about_profile JSON NOT NULL
         )"""
 
         insert_content_query = f"""INSERT INTO {self.data_table_name} (
-                profile_id,
+                username,
                 url,
                 seller_status,
                 title,
@@ -173,9 +172,8 @@ class Database:
                 gig_stars,
                 about_profile 
             ) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s) """
-
+        conn = self._connect_with_database();
         try:
-            conn = self._connect_with_database();
             with conn.cursor() as cursor:
                 if not database_utils.is_table_exist(conn, self.data_table_name):
                     log.info("| Creating table for storing data.")
@@ -183,7 +181,6 @@ class Database:
                     log.info(f"| Successfully created table '{self.data_table_name}'.")
 
                 log.info("Inserting gig data into database")
-                profile_id = database_utils.get_id_by_email(conn, self.auth_table_name, user["email"])
 
                 if type(data.ratings) == str:
                     data.ratings = {"message": data.ratings}
@@ -194,7 +191,7 @@ class Database:
                 cursor.execute(
                     insert_content_query,
                     (
-                        profile_id,
+                        user["username"],
                         data.url,
                         data.seller_status,
                         data.title,
@@ -213,30 +210,24 @@ class Database:
                 conn.commit()
                 content_id = cursor.lastrowid
             conn.close()
-            return {"content_id": content_id, "user_id": profile_id}
-
+            return {"content_id": content_id, "username": user["username"]}
         except pymysql.Error as e:
             log.error(f"| Failed to upload gig content into database: {e}")
             return False
 
 
 
-    def get_content_by_id(self, user_id, content_id, email):
-        get_user_id_by_email_query = f"""SELECT id FROM {self.auth_table_name} WHERE email = %s """
+    def get_content_by_id(self, username, content_id):
         get_content_by_id_query = f"""SELECT * FROM {self.data_table_name} WHERE content_id = %s """
         conn = self._connect_with_database()
 
         with conn.cursor(pymysql.cursors.DictCursor) as cursor:
-            cursor.execute(get_user_id_by_email_query, (email,))
-            original_content_user_id = cursor.fetchone()
-
-            if not original_content_user_id["id"] == user_id:
-                return {"success": False, "message": "You are not The Owner"}
-
             cursor.execute(get_content_by_id_query, (content_id,))
             content = cursor.fetchone()
             conn.close()
-            content.pop("profile_id")
+            if not content["username"] == username:
+                return {"success": False, "message": "You are not The Owner"}
+            content.pop("username")
             content.pop("content_id")
             return {"success": True, "message": content}
 
@@ -270,32 +261,24 @@ class Database:
                     log.info(f"| Success: Created schema '{self.report_table_name}'. ")
                     conn.commit()
                 gig_score = report["scores"]["overall"]["score"]
-                # gig_score = 34
-                print("score", gig_score)
                 gig_type = report["meta"]["subcategory"].split(">")[-1]
-                # gig_type = "wordpress"
-                print("gigtype", gig_type)
                 cursor.execute(insert_report_query, (username, title, json.dumps(report), gig_score, gig_type))
                 conn.commit()
+            conn.close()
         except pymysql.Error as e:
             log.error(f"| Error: {e}")
 
-        finally:
-            conn.close()
 
-    def get_reports_info_by_username(self, username):
+    def get_all_reports_by_username(self, username):
         query = f""" SELECT report_id, title, score, type, analyzed_at FROM {self.report_table_name} WHERE username = %s """
+        conn = self._connect_with_database()
         try:
-            conn = self._connect_with_database()
             with conn.cursor() as cursor:
                 cursor.execute(query, (username,))
                 reports = cursor.fetchall()
+                conn.close()
                 return reports
         except pymysql.Error as e:
             log.error(f"| Error: {e}")
-        finally:
-            if conn:
-                conn.close()
 
-    def save_report_in_database(self):
-        ...
+

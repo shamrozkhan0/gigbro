@@ -1,6 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
 import {
-  ShoppingBag,
   Home,
   Sparkles,
   Check,
@@ -8,7 +7,6 @@ import {
   BarChart3,
   MessageSquareText,
   Lightbulb,
-  Clock,
 } from 'lucide-react';
 
 const TOTAL_DURATION = 30; // seconds
@@ -66,7 +64,6 @@ export default function Waiting() {
     Math.floor(elapsed / STEP_DURATION),
     STEPS.length - 1
   );
-  const remaining = Math.max(0, Math.ceil(TOTAL_DURATION - elapsed));
   const done = elapsed >= TOTAL_DURATION;
 
   const stepStatus = (i) => {
@@ -79,9 +76,6 @@ export default function Waiting() {
     <div className="min-h-screen bg-white text-slate-900 flex flex-col">
       <header className="flex items-center justify-between px-6 md:px-10 py-4 border-b border-slate-100">
         <div className="flex items-center gap-2">
-          {/* <div className="w-8 h-8 rounded-lg bg-emerald-500 flex items-center justify-center">
-            <ShoppingBag className="w-4.5 h-4.5 text-white" strokeWidth={2.5} />
-          </div> */}
           <span className="font-bold text-lg tracking-tight">
             Gig<span className="text-emerald-500">Bro</span>
           </span>

@@ -1,3 +1,5 @@
+import json
+
 from fastapi import FastAPI, Response, Cookie, HTTPException
 from entity.authentication import LoginUser, SignupUser
 from fastapi.middleware.cors import CORSMiddleware
@@ -76,26 +78,25 @@ def save_content(data: Data, jwt_token: str = Cookie()):
     user = verify_jwt(jwt_token)
     db = Database()
     result = db.setContent(data, user["user"])
-    return {"success": True, "message": "Save successfully", "content_id": result["content_id"], "user_id": result["user_id"]}
+    return {"success": True, "message": "Save successfully", "content_id": result["content_id"], "username": result["username"]}
 
 
 class ContentRequest(BaseModel):
-    user_id:int
+    username:str
     content_id:int
 
-@app.get("/getcontent/{user_id}/{content_id}")
-def get_content(user_id:int, content_id:int, jwt_token=Cookie(...)):
+@app.get("/getcontent/{username}/{content_id}")
+def get_content(username:str, content_id:int, jwt_token=Cookie(...)):
     email = verify_jwt(jwt_token)
-    request = ContentRequest(user_id=user_id, content_id=content_id)
+    request = ContentRequest(username=username, content_id=content_id)
     db = Database()
-    content = db.get_content_by_id(request.user_id, request.content_id, email["user"]["email"])
+    content = db.get_content_by_id(request.username, request.content_id)
     a = Analyzer(content["message"])
-    result= a.get_response()
+    result = a.get_response()
     db = Database()
     conn = db._connect_with_database()
-    username = database_utils.get_username_by_id(conn, "user", user_id  )
     conn.close()
-    db.save_report(username=username, title=content["message"]["title"], report=result)
+    db.save_report(username=username, title= content["message"]["title"], report=result)
     return result
 
 
@@ -104,15 +105,56 @@ def get_projects(username: str, jwt_token=Cookie(...)):
     if not verify_jwt(jwt_token):
         HTTPException(status_code=404, detail="User not Login")
     db = Database()
-    reports = db.get_reports_info_by_username(username)
+    reports = db.get_all_reports_by_username(username)
     return {
         "success" : True,
         "message" : reports
     }
 
 
+@app.get("/getreport/{username}/{report_id}")
+def get_report(username:str, report_id:int, jwt_token: str = Cookie()):
+
+    user = verify_jwt(jwt_token)
+
+    try:
+        if not user["success"]:
+            return user
+
+        db = Database()
+
+        response = database_utils.get_report_by_id(
+            db._connect_with_database(),
+            db.report_table_name,
+            report_id
+        )
+
+        if not response["success"]:
+            return response
+
+
+        report_username = response["username"]
+        report = response["report"]
+
+        if not (username == report_username) and not (username == user["username"]):
+            return {
+                "success" : False,
+                "message" : "Your are not the respected owner"
+            }
+
+        return {
+            "success" : True,
+            "message" : json.loads(report)
+        }
+
+    except Exception as e:
+        return ...
+
+
+
+
 @app.get("/getdasboard/{username}/{id}")
-def getUserDashboard(username: str, id:int, jwt:str = Cookie()):
+def getUserDashboard(username:str, id:int, jwt:str = Cookie()):
     ...
 
 

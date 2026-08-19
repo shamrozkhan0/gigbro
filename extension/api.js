@@ -73,8 +73,11 @@ async function senddata(data) {
   }
   showModal("Successfully Fetched the content", true)
 
+  const data2 = await response.json()
+  console.log("Final Data when scrapping", data2)
+
   setTimeout(() => {
-    chrome.tabs.create({ url: WEB_URL + "dashboard" });
+    chrome.tabs.create({ url: WEB_URL + `${data2.username}/dashboard/${data2.content_id}` });
   }, 1000);
 
 }
@@ -110,19 +113,16 @@ function showModal(message, isSuccess) {
 
 
 async function isFiverTab() {
-
   const activeTab = { active: true, currentWindow: true };
 
   const [tab] = await chrome.tabs.query(activeTab);
   const url = tab.url.startsWith("https://www.fiverr.com/")
-
 
   const isLoggedIn = await fetch("http://localhost:8000/me", {
     credentials: "include"
   }).then(res => res.ok ? true : false).catch(err => {
     console.error(err)
   });
-
   if (isLoggedIn) {
     if (url) {
       showScrapper()

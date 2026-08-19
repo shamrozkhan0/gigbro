@@ -27,17 +27,17 @@ def get_id_by_email(conn, table_name, email):
             cursor.execute(get_id_by_email_query, (email,))
             return cursor.fetchone()
     except pymysql.Error as e:
-        log.info(e)
+        return e
 
 
-def get_username_by_id(conn, table_name, id):
+def get_username_by_id(conn, table_name, ):
     get_username_by_id_query = f"""SELECT username FROM {table_name} WHERE id = %s"""
     try:
         with conn.cursor() as cursor:
             cursor.execute(get_username_by_id_query, (id,))
             return cursor.fetchone()
     except pymysql.Error as e:
-        log.info(e)
+        return e
 
 
 def is_table_exist(conn, table_name: str):
@@ -50,3 +50,28 @@ def is_table_exist(conn, table_name: str):
     except pymysql.Error as e:
         log.info(f"| Error while checking if database exist {e} ")
         return e
+
+
+
+# def check_if_report_exist(conn, table, id):
+    
+
+def get_report_by_id(conn, table, id):
+    print("insdie report")
+    query = f"""SELECT username, report FROM {table} WHERE report_id = %s """
+    try:
+        with conn.cursor() as cursor:
+            cursor.execute(query, (id,))
+            data = cursor.fetchone()
+            if data == None:
+                print("data is null")
+                return {"success" : False, "message": "The report does not Exist"}
+            return {"success": True, "username": data[0], "report": data[1]}
+    except pymysql.Error as e:
+        log.error(f"| Error: {e}")
+        return None
+
+
+    finally:
+        if conn:
+            conn.close()

@@ -1,14 +1,14 @@
+import FullReport from "./components/reportTemplate/FullReport.jsx"
 import { BrowserRouter, Route, Routes } from "react-router-dom"
 import ProtectedRoutes from "./Routes/ProtectedRoutes.jsx"
 import LandingPage from "./pages/LandingPage.jsx"
+import Waiting from "./components/Waiting.jsx"
 import Dashboard from "./pages/Dashboard.jsx"
 import Signup from "./components/Signup.jsx"
 import NotFound from "./pages/NotFound.jsx"
 import Login from "./components/Login.jsx"
 import Auth from "./pages/Auth.jsx"
 import "./App.css"
-import Waiting from "./components/Waiting.jsx"
-import GigReport from "./components/reportTemplate/GigReport.jsx"
 
 function App() {
   return (
@@ -19,7 +19,7 @@ function App() {
           <Route path="/" element={<LandingPage />} />
           <Route path="/dashboarddemo" element={<Dashboard/>} />
           <Route path="*" element={<NotFound/>}/> 
-          <Route path="/:username/report/:id" element={<GigReport/>}/>
+          <Route path="/:username/report/:id" element={<FullReport/>}/>
           <Route path="/wait" element={<Waiting/>}/>
           
           {/* Authentication Routes contains Login and Signup pages */}
