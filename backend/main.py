@@ -1,4 +1,5 @@
 import json
+from email import message
 
 from fastapi import FastAPI, Response, Cookie, HTTPException
 from entity.authentication import LoginUser, SignupUser
@@ -81,13 +82,16 @@ def save_content(data: Data, jwt_token: str = Cookie()):
     return {"success": True, "message": "Save successfully", "content_id": result["content_id"], "username": result["username"]}
 
 
+
 class ContentRequest(BaseModel):
     username:str
     content_id:int
 
-@app.get("/getcontent/{username}/{content_id}")
-def get_content(username:str, content_id:int, jwt_token=Cookie(...)):
-    email = verify_jwt(jwt_token)
+@app.get("/analyze/{username}/{content_id}")
+def analyze(username:str, content_id:int, jwt_token=Cookie(...)):
+    isLogin = verify_jwt(jwt_token)
+    if not isLogin["success"]:
+        return {"success": False, "message": "User is not authorized"}
     request = ContentRequest(username=username, content_id=content_id)
     db = Database()
     content = db.get_content_by_id(request.username, request.content_id)
@@ -96,14 +100,15 @@ def get_content(username:str, content_id:int, jwt_token=Cookie(...)):
     db = Database()
     conn = db._connect_with_database()
     conn.close()
-    db.save_report(username=username, title= content["message"]["title"], report=result)
-    return result
+    report_id = db.save_report(username=username, title= content["message"]["title"], report=result)
+    return { "success": True, "report_id": report_id }
+
 
 
 @app.get("/{username}/getprojects")
 def get_projects(username: str, jwt_token=Cookie(...)):
     if not verify_jwt(jwt_token):
-        HTTPException(status_code=404, detail="User not Login")
+        return {"success": False, "message": "User Not Login"}
     db = Database()
     reports = db.get_all_reports_by_username(username)
     return {
@@ -113,8 +118,7 @@ def get_projects(username: str, jwt_token=Cookie(...)):
 
 
 @app.get("/getreport/{username}/{report_id}")
-def get_report(username:str, report_id:int, jwt_token: str = Cookie()):
-
+def get_report_if_exist(username:str, report_id:int, jwt_token: str = Cookie()):
     user = verify_jwt(jwt_token)
 
     try:

@@ -53,9 +53,6 @@ def is_table_exist(conn, table_name: str):
 
 
 
-# def check_if_report_exist(conn, table, id):
-    
-
 def get_report_by_id(conn, table, id):
     print("insdie report")
     query = f"""SELECT username, report FROM {table} WHERE report_id = %s """

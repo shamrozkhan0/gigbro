@@ -13,6 +13,7 @@ import {
   Crown,
   Info,
 } from "lucide-react";
+import { useNotification } from "../context/NotificationContext.jsx";
 
 const randomColor = [
   "bg-purple-100 text-purple-600",
@@ -39,6 +40,7 @@ const navItems = [
 const Dashboard = () => {
   const {setIsAuthenticated, user, setUser } = useAuth()
   const BACKEND_URL = import.meta.env.VITE_BACKEND_URL
+  const { showNotification } = useNotification()
   const [reports, setReports] = useState([])
   console.log(user)
 
@@ -74,6 +76,14 @@ useEffect(() => {
       );
 
       const data = await response.json();
+
+      if(!data.success){
+        showNotification({
+          success: false,
+          message: data.message
+        })
+        return;
+      }
 
       const reports = data.message.map(report => ({
         ...report,

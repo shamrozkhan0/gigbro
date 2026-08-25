@@ -155,7 +155,6 @@ class Database:
             gig_stars JSON,
             about_profile JSON NOT NULL
         )"""
-
         insert_content_query = f"""INSERT INTO {self.data_table_name} (
                 username,
                 url,
@@ -216,11 +215,9 @@ class Database:
             return False
 
 
-
     def get_content_by_id(self, username, content_id):
         get_content_by_id_query = f"""SELECT * FROM {self.data_table_name} WHERE content_id = %s """
         conn = self._connect_with_database()
-
         with conn.cursor(pymysql.cursors.DictCursor) as cursor:
             cursor.execute(get_content_by_id_query, (content_id,))
             content = cursor.fetchone()
@@ -251,7 +248,6 @@ class Database:
             score,
             type
         )  VALUES (%s, %s, %s, %s,%s)"""
-
         try:
             conn = self._connect_with_database()
             with conn.cursor() as cursor:
@@ -264,7 +260,9 @@ class Database:
                 gig_type = report["meta"]["subcategory"].split(">")[-1]
                 cursor.execute(insert_report_query, (username, title, json.dumps(report), gig_score, gig_type))
                 conn.commit()
-            conn.close()
+                report_id = cursor.lastrowid
+                conn.close()
+                return report_id
         except pymysql.Error as e:
             log.error(f"| Error: {e}")
 
@@ -280,5 +278,3 @@ class Database:
                 return reports
         except pymysql.Error as e:
             log.error(f"| Error: {e}")
-
-

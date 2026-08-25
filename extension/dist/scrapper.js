@@ -790,7 +790,6 @@
 
   // src/scrapper.js
   function scrapper() {
-    console.log("scrapper runs");
     const data = {
       title: getTitle(),
       gig_description: getDescription(),

@@ -77,7 +77,7 @@ async function senddata(data) {
   console.log("Final Data when scrapping", data2)
 
   setTimeout(() => {
-    chrome.tabs.create({ url: WEB_URL + `${data2.username}/dashboard/${data2.content_id}` });
+    chrome.tabs.create({ url: WEB_URL + `${data2.username}/analyze-report/${data2.content_id}` });
   }, 1000);
 
 }
@@ -89,7 +89,6 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
     senddata(message.data)
   }
 });
-
 
 
 function showModal(message, isSuccess) {
@@ -133,11 +132,9 @@ async function isFiverTab() {
   } else {
     showLogin()
   }
-
 }
 
 isFiverTab()
-
 
 
 async function logout() {
@@ -171,7 +168,6 @@ const showLogin = () => {
 };
 
 
-
 // This function inject's scrapper HTML in the extension if user is login
 const showScrapper = () => {
   const container = document.querySelector("div.container div.wrapper");
@@ -193,6 +189,7 @@ const showScrapper = () => {
 
     catch (error) {
       console.error("Error: ", error)
+       return showModal("Something went Wrong", false)
     }
 
   // console.log("content is scrapped", isScrapped)

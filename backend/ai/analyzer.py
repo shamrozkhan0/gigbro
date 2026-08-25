@@ -110,7 +110,7 @@ class Analyzer:
         for attempt in range(max_retries + 1):
             try:
                 response = self.client.responses.create(
-                    model="llama-3.3-70b-versatile",
+                    model="openai/gpt-oss-120b",
                     instructions=instructions,
                     input=input_json
                 )

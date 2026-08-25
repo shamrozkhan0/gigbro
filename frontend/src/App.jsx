@@ -1,6 +1,7 @@
 import FullReport from "./components/reportTemplate/FullReport.jsx"
 import { BrowserRouter, Route, Routes } from "react-router-dom"
 import ProtectedRoutes from "./Routes/ProtectedRoutes.jsx"
+import ReportManager from "./pages/ReportManager.jsx"
 import LandingPage from "./pages/LandingPage.jsx"
 import Waiting from "./components/Waiting.jsx"
 import Dashboard from "./pages/Dashboard.jsx"
@@ -19,8 +20,6 @@ function App() {
           <Route path="/" element={<LandingPage />} />
           <Route path="/dashboarddemo" element={<Dashboard/>} />
           <Route path="*" element={<NotFound/>}/> 
-          <Route path="/:username/report/:id" element={<FullReport/>}/>
-          <Route path="/wait" element={<Waiting/>}/>
           
           {/* Authentication Routes contains Login and Signup pages */}
           <Route element={<Auth/>}>
@@ -31,6 +30,8 @@ function App() {
           {/* Private routes only accessable when user is authenticated */}
           <Route element={<ProtectedRoutes/>}>
             <Route path="/dashboard" element={<Dashboard/>} />
+            <Route path="/:username/analyze-report/:content_id" element={<Waiting/>}/>
+            <Route path="/:username/report/:report_id" element={<ReportManager/>}/>
           </Route>
         </Routes>
       </BrowserRouter>
