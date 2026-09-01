@@ -1,27 +1,31 @@
-from openai import OpenAI, RateLimitError
 from datetime import datetime, timezone
 from pathlib import Path
 import json
 import time
 import os
 
+from dotenv import load_dotenv
+from google import genai
+from google.genai import errors
+
+load_dotenv()
+
+# Model choice: Gemini 3.5 Flash via the Gemini Interactions API.
+# (Swap this constant if you later want to try a different Gemini model,
+# e.g. "gemini-3.1-flash-lite" or "gemini-3.5-pro".)
+GEMINI_MODEL = "gemini-3.5-flash"
 
 
 class Analyzer:
 
     def __init__(self, content):
-        self.client = OpenAI(
-            api_key=os.environ.get("GROQ_API_KEY"),
-            base_url="https://api.groq.com/openai/v1",
-        )
+        self.client = genai.Client(api_key=os.environ.get("GEMINI_KEY"))
         self.content = content
-
 
     def load_file(self, filename: str):
         path = Path("instructions") / filename
         with open(path, "r", encoding="utf-8") as file:
             return file.read()
-
 
     @staticmethod
     def _safe_json_loads(value):
@@ -34,7 +38,6 @@ class Analyzer:
         except (json.JSONDecodeError, TypeError) as e:
             print(f"Warning: could not parse expected JSON field ({e}): {value!r}")
             return None
-
 
     def get_data(self):
         c = self.content
@@ -55,13 +58,14 @@ class Analyzer:
         }
         return data
 
-
     @staticmethod
-    def _parse_response(response):
-        text = getattr(response, "output_text", None)
+    def _parse_response(interaction):
+        # google-genai's Interactions API exposes the final text via the
+        # `output_text` convenience property (joins consecutive text blocks).
+        text = getattr(interaction, "output_text", None)
         if text is None:
             try:
-                text = response.output[0].content[0].text
+                text = interaction.outputs[-1].text
             except Exception as e:
                 raise ValueError(f"Could not extract text from response: {e}")
 
@@ -77,11 +81,9 @@ class Analyzer:
         except json.JSONDecodeError as e:
             raise ValueError(f"Model did not return valid JSON: {e}\nRaw text: {text[:500]}")
 
-
     _ILLEGAL_TITLE_CHARS = str.maketrans({
         "|": " ", "&": " and ", "<": "", ">": "",
     })
-
 
     @classmethod
     def _sanitize_title_field(cls, text: str) -> str:
@@ -90,7 +92,6 @@ class Analyzer:
         cleaned = text.translate(cls._ILLEGAL_TITLE_CHARS)
         # collapse any double spaces left behind by the substitutions
         return " ".join(cleaned.split())
-
 
     @classmethod
     def _sanitize_part3_output(cls, result: dict) -> dict:
@@ -102,27 +103,28 @@ class Analyzer:
                 oc["tags"] = [cls._sanitize_title_field(t) for t in oc["tags"]]
         return result
 
-
     def _call(self, instructions_file: str, payload: dict, max_retries: int = 4):
         instructions = self.load_file(instructions_file)
         input_json = json.dumps(payload)
 
         for attempt in range(max_retries + 1):
             try:
-                response = self.client.responses.create(
-                    model="openai/gpt-oss-120b",
-                    instructions=instructions,
-                    input=input_json
+                interaction = self.client.interactions.create(
+                    model=GEMINI_MODEL,
+                    system_instruction=instructions,
+                    input=input_json,
                 )
-                return self._parse_response(response)
+                return self._parse_response(interaction)
 
-            except RateLimitError as e:
-                if attempt == max_retries:
+            except errors.APIError as e:
+                # 429 = rate limited / quota exceeded. Anything else (4xx auth,
+                # 5xx server errors, etc.) is re-raised immediately.
+                if e.code != 429 or attempt == max_retries:
                     raise
 
                 retry_after = None
                 try:
-                    retry_after = float(e.response.headers.get("retry-after"))
+                    retry_after = float(e.details.get("retry_after"))
                 except (AttributeError, TypeError, ValueError):
                     pass
 
@@ -134,20 +136,17 @@ class Analyzer:
                 )
                 time.sleep(wait)
 
-
     def request_one(self):
         payload = self.get_data()
         req1 = self._call("request1.md", payload)
         req1["meta"]["analyze_at"] = datetime.now(timezone.utc).isoformat(timespec="milliseconds").replace("+00:00", "Z")
         return req1
 
-
     def request_two(self, part1_output: dict | None = None):
         payload = {"gig": self.get_data()}
         if part1_output is not None:
             payload["part1_output"] = part1_output
         return self._call("request2.md", payload)
-
 
     @staticmethod
     def _trim_part1_for_synthesis(part1_output: dict) -> dict:
@@ -175,7 +174,6 @@ class Analyzer:
             "buyer_questions": buyer_psych.get("questions", []),
         }
 
-
     @staticmethod
     def _trim_part2_for_synthesis(part2_output: dict) -> dict:
         return {
@@ -193,7 +191,6 @@ class Analyzer:
             "packages": full.get("packages"),
         }
 
-
     def request_three(self, part1_output: dict, part2_output: dict):
         payload = {
             "gig": self._get_gig_essentials(),
@@ -203,10 +200,9 @@ class Analyzer:
         result = self._call("request3.md", payload)
         return self._sanitize_part3_output(result)
 
-
     def get_response(self):
         result = {}
-        errors = {}
+        errors_out = {}
 
         part1_output = None
         part2_output = None
@@ -216,14 +212,14 @@ class Analyzer:
             result.update(part1_output)
         except Exception as e:
             print(f"Request 1 failed: {e}")
-            errors["request1"] = str(e)
+            errors_out["request1"] = str(e)
 
         try:
             part2_output = self.request_two(part1_output)
             result.update(part2_output)
         except Exception as e:
             print(f"Request 2 failed: {e}")
-            errors["request2"] = str(e)
+            errors_out["request2"] = str(e)
 
         if part1_output is not None and part2_output is not None:
             try:
@@ -231,12 +227,12 @@ class Analyzer:
                 result.update(part3_output)
             except Exception as e:
                 print(f"Request 3 failed: {e}")
-                errors["request3"] = str(e)
+                errors_out["request3"] = str(e)
         else:
-            errors["request3"] = "Skipped: requires both Part 1 and Part 2 output"
+            errors_out["request3"] = "Skipped: requires both Part 1 and Part 2 output"
 
-        if errors:
-            result["_errors"] = errors
+        if errors_out:
+            result["_errors"] = errors_out
 
         print("=" * 100)
         return result

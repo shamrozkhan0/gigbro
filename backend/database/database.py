@@ -11,6 +11,7 @@ import json
 load_dotenv()
 log.basicConfig(level=log.INFO, format="%(asctime)s - %(name)s - %(levelname)s - %(message)s",)
 
+
 class Database:
 
     def __init__(self):
@@ -256,9 +257,9 @@ class Database:
                     cursor.execute(create_report_table_query)
                     log.info(f"| Success: Created schema '{self.report_table_name}'. ")
                     conn.commit()
-                gig_score = report["scores"]["overall"]["score"]
-                gig_type = report["meta"]["subcategory"].split(">")[-1]
-                cursor.execute(insert_report_query, (username, title, json.dumps(report), gig_score, gig_type))
+                # gig_score = report["scores"]["overall"]["score"]
+                # gig_type = report["meta"]["subcategory"].split(">")[-1]
+                cursor.execute(insert_report_query, (username, title, json.dumps(report), 69, "static"))
                 conn.commit()
                 report_id = cursor.lastrowid
                 conn.close()

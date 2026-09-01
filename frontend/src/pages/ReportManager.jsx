@@ -42,7 +42,6 @@ export default function ReportManager() {
         console.log(data.message)
         setReport(data.message)
       } catch (err) {
-
         console.log("Error ", err)
       }
     }
