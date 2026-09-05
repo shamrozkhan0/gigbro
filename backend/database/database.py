@@ -257,9 +257,9 @@ class Database:
                     cursor.execute(create_report_table_query)
                     log.info(f"| Success: Created schema '{self.report_table_name}'. ")
                     conn.commit()
-                # gig_score = report["scores"]["overall"]["score"]
-                # gig_type = report["meta"]["subcategory"].split(">")[-1]
-                cursor.execute(insert_report_query, (username, title, json.dumps(report), 69, "static"))
+                gig_score = report["scores"]["overall"]["score"]
+                gig_type = report["meta"]["subcategory"].split(">")[-1]
+                cursor.execute(insert_report_query, (username, title, json.dumps(report), gig_score, gig_type))
                 conn.commit()
                 report_id = cursor.lastrowid
                 conn.close()

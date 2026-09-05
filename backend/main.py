@@ -169,7 +169,7 @@ def getUserDashboard(username:str, id:int, jwt:str = Cookie()):
 
 # ==================== For testing =====================
 @app.get("/get")
-def analyze():
+def z2lyze():
     query = f""" SELECT * FROM data"""
     db = Database()
     conn = db._connect_with_database()

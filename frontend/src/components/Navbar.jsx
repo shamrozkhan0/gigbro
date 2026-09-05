@@ -41,7 +41,6 @@ export default function Navbar() {
   const [mobileOpen, setMobileOpen] = useState(false);
   const [isLogin, setIsLogin] = useState(false)
   const authURL = import.meta.env.VITE_BACKEND_URL + "me"
-  console.log("url", authURL)
 
 
   useEffect(() => {
@@ -54,13 +53,7 @@ export default function Navbar() {
             credentials: "include",
           }
         );
-
-        console.log("Status:", response.status);
-
         const data = await response.json();
-
-        console.log("ME RESPONSE:", data);
-
         setIsLogin(data.success);
       } catch (error) {
         console.error("Check login error:", error);

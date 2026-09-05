@@ -8,8 +8,12 @@ import Dashboard from "./pages/Dashboard.jsx"
 import Signup from "./components/Signup.jsx"
 import NotFound from "./pages/NotFound.jsx"
 import Login from "./components/Login.jsx"
-import Auth from "./pages/Auth.jsx"
+import AuthRoutes from "./Routes/AuthRoutes.jsx"
 import "./App.css"
+import Loading from "./pages/Loading.jsx"
+import EditorRoutes from "./Routes/EditorRoutes.jsx"
+import ShortReportEditor from "./components/ShortReportEditor.jsx"
+import { gig_data } from "../data2.js"
 
 function App() {
   return (
@@ -20,18 +24,25 @@ function App() {
           <Route path="/" element={<LandingPage />} />
           <Route path="/dashboarddemo" element={<Dashboard/>} />
           <Route path="*" element={<NotFound/>}/> 
+          <Route path="l" element={<Loading/>}/>
+          <Route path="/huzaifa/report" element={<FullReport gig_data={gig_data.report}/>} />
           
           {/* Authentication Routes contains Login and Signup pages */}
-          <Route element={<Auth/>}>
-            <Route path="/login" element={<Login />} />
-            <Route path="/signup" element={<Signup />} />
+          <Route path="/auth" element={<AuthRoutes/>}>
+            <Route path="login" element={<Login />} />
+            <Route path="signup" element={<Signup />} />
           </Route>
 
           {/* Private routes only accessable when user is authenticated */}
           <Route element={<ProtectedRoutes/>}>
             <Route path="/dashboard" element={<Dashboard/>} />
             <Route path="/:username/analyze-report/:content_id" element={<Waiting/>}/>
-            <Route path="/:username/report/:report_id" element={<ReportManager/>}/>
+            <Route path="/:username/report/:report_id" element={<FullReport gig_data={gig_data.report}/>}/>
+
+            <Route path="/editor" element={<EditorRoutes/>}>
+              <Route path="shortreport" element={<ShortReportEditor/>} />
+            </Route>
+
           </Route>
         </Routes>
       </BrowserRouter>

@@ -12,9 +12,9 @@ import Pricing from "./Pricing.jsx"
 import { useAuth } from "../context/AuthContext.jsx"
 
 const LandingPage = () => {
-    const {isAuthenticated, loading} = useAuth()
-    console.log(isAuthenticated);
-    console.log(loading)
+    // const {isAuthenticated, loading} = useAuth()
+    // console.log(isAuthenticated);
+    // console.log(loading)
     return (
         <>
             <BackendNotification/>

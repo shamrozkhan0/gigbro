@@ -1,6 +1,6 @@
 import { Outlet } from "react-router-dom";
 
-const Auth = () => {
+const AuthRoutes = () => {
   return (
     <>
       <Outlet/>
@@ -8,4 +8,4 @@ const Auth = () => {
   )
 }
 
-export default Auth;
+export default AuthRoutes;

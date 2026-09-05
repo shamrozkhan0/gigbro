@@ -1,10 +1,11 @@
-import DashboardAnalyzeGig from "../images/dashboard-analyze-gig.png"
+import DashboardAnalyzeGig from "../images/dashboard-analyze-gig.png";
+import { useNotification } from "../context/NotificationContext.jsx";
+import { AnimatePresence, motion } from "motion/react";
+import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
-import { useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
 import GigBroLogo from "../images/logo.png";
 import { logout } from "../utils/logout.js";
-
 import {
   Plus,
   ChevronDown,
@@ -12,8 +13,8 @@ import {
   MoreVertical,
   Crown,
   Info,
+  Lock,
 } from "lucide-react";
-import { useNotification } from "../context/NotificationContext.jsx";
 
 const randomColor = [
   "bg-purple-100 text-purple-600",
@@ -38,11 +39,11 @@ const navItems = [
 ];
 
 const Dashboard = () => {
-  const {setIsAuthenticated, user, setUser } = useAuth()
+  const { setIsAuthenticated, user, setUser } = useAuth()
+  const [isNewAnalysisClicked, setIsNewAnalysisClicked] = useState(false)
   const BACKEND_URL = import.meta.env.VITE_BACKEND_URL
   const { showNotification } = useNotification()
   const [reports, setReports] = useState([])
-  console.log(user)
 
   const [menuOpen, setMenuOpen] = useState(false);
   const navigate = useNavigate()
@@ -63,44 +64,218 @@ const Dashboard = () => {
   }
 
 
-useEffect(() => {
-  if (!user?.username) return;
+  useEffect(() => {
+    if (!user?.username) return;
+    console.log(user)
 
-  const getDashboardReports = async () => {
-    try {
-      const response = await fetch(
-        `${BACKEND_URL}${user.username}/getprojects`,
-        {
-          credentials: "include",
+    const getDashboardReports = async () => {
+      try {
+        const response = await fetch(
+          `${BACKEND_URL}${user.username}/getprojects`,
+          {
+            credentials: "include",
+          }
+        );
+
+        const data = await response.json();
+
+        if (!data.success) {
+          showNotification({
+            success: false,
+            message: data.message
+          })
+          return;
         }
-      );
 
-      const data = await response.json();
+        const reports = data.message.map(report => ({
+          ...report,
+          color: randomColor[Math.floor(Math.random() * randomColor.length)]
+        }))
 
-      if(!data.success){
-        showNotification({
-          success: false,
-          message: data.message
-        })
-        return;
+        setReports(reports)
       }
+      catch (err) {
+        console.error("Error: ", err);
+      }
+    };
 
-      const reports = data.message.map(report => ({
-        ...report,
-        color: randomColor[Math.floor(Math.random() * randomColor.length)]
-      }))
-   
-      setReports(reports)
-    }
-     catch (err) {
-      console.error("Error: ",err);
-    }
-  };
+    getDashboardReports();
+  }, [user?.username]);
 
-  getDashboardReports();
-}, [user?.username]);
 
-console.log(reports)
+
+  const AnalysisButton = () => {
+    return (
+      <>
+        {/* Backdrop */}
+        <motion.div
+          key="backdrop"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
+          transition={{ duration: 0.25 }}
+          className="fixed inset-0 z-40 bg-black/40 backdrop-blur-sm"
+          onClick={() => setIsNewAnalysisClicked(false)}
+        />
+
+        {/* Modal */}
+        <motion.div
+          key="modal"
+          initial={{
+            opacity: 0,
+            y: 80,
+            scale: 0.95,
+          }}
+          animate={{
+            opacity: 1,
+            y: 0,
+            scale: 1,
+          }}
+          exit={{
+            opacity: 0,
+            y: 80,
+            scale: 0.95,
+          }}
+          transition={{
+            duration: 0.45,
+            ease: [0.22, 1, 0.36, 1],
+          }}
+          className="
+          fixed
+          left-1/2
+          top-1/2
+          z-50
+          w-[90%]
+          max-w-md
+          -translate-x-1/2
+          -translate-y-1/2
+          rounded-2xl
+          border
+          border-gray-200
+          bg-white
+          p-6
+          shadow-2xl
+        "
+        >
+          {/* Header */}
+          <div className="mb-6">
+            <h2 className="text-xl font-semibold text-gray-900">
+              Choose your report
+            </h2>
+
+            <p className="mt-1 text-sm text-gray-500">
+              Select the type of Fiverr gig analysis you want to generate.
+            </p>
+          </div>
+
+          {/* Options */}
+          <div className="flex flex-col gap-3">
+            <Link
+              to="/editor/shortreport"
+              onClick={() => setIsNewAnalysisClicked(false)}
+              className="
+              group
+              flex
+              items-center
+              justify-between
+              rounded-xl
+              bg-[#11A22F]
+              px-5
+              py-4
+              text-white
+              transition-all
+              duration-200
+              hover:bg-[#0d8d28]
+              hover:shadow-lg
+              hover:shadow-green-500/20
+            "
+            >
+              <div>
+                <p className="font-semibold">Short Report</p>
+                <p className="text-sm text-white/75">
+                  Quick overview & key recommendations
+                </p>
+              </div>
+
+              <span className="text-xl transition-transform group-hover:translate-x-1">
+                →
+              </span>
+            </Link>
+
+            {user.is_premium_user ?
+
+              <Link
+                to="/editor/fullreport"
+                onClick={() => setIsNewAnalysisClicked(false)}
+                className="
+              group
+              flex
+              items-center
+              justify-between
+              rounded-xl
+              border
+              border-gray-200
+              bg-gray-50
+              px-5
+              py-4
+              text-gray-900
+              transition-all
+              duration-200
+              hover:border-[#11A22F]
+              hover:bg-green-50
+            "
+              >
+                <div>
+                  <p className="font-semibold">Full Report</p>
+                  <p className="text-sm text-gray-500">
+                    Deep SEO, conversion & gig analysis
+                  </p>
+                </div>
+
+                <span className="text-xl text-[#11A22F] transition-transform group-hover:translate-x-1">
+                  <Lock />
+                </span>
+              </Link>
+              :
+              <span
+                className="group flex items-center justify-between rounded-xl border border-gray-200 bg-gray-50 px-5 py-4 text-gray-900"
+              >
+                <div>
+                  <p className="font-semibold">Full Report</p>
+                  <p className="text-sm text-gray-500">
+                    Deep SEO, conversion & gig analysis
+                  </p>
+                </div>
+
+                <span className="text-xl text-[#11A22F] transition-transform group-hover:translate-x-1">
+                  <Lock />
+                </span>
+              </span>
+
+            }
+          </div>
+
+          {/* Close */}
+          <button
+            onClick={() => setIsNewAnalysisClicked(false)}
+            className="
+            mt-5
+            w-full
+            rounded-lg
+            py-2
+            text-sm
+            text-gray-500
+            transition
+            hover:bg-gray-100
+            hover:text-gray-700
+          "
+          >
+            Cancel
+          </button>
+        </motion.div>
+      </>
+    )
+  }
 
 
   return (
@@ -209,6 +384,9 @@ console.log(reports)
       <main className="flex-1 overflow-y-auto">
         {/* Topbar */}
 
+        {/* This is the option which will open when "new analysis button clicked" */}
+
+
         <div className="flex items-center justify-between md:justify-end gap-4 border-b border-gray-100 bg-white px-6 py-4 md:px-10">
           <div className="flex md:hidden items-center gap-2 px-2">
             <img src={GigBroLogo} alt="Gigbro Logo" className="w-10 h-10" />
@@ -239,12 +417,6 @@ console.log(reports)
 
               {menuOpen && (
                 <div className="absolute right-0 top-12 w-48 rounded-xl border border-gray-100 bg-white p-2 shadow-lg">
-                  {/* <button className="flex w-full items-center gap-2.5 rounded-lg px-3 py-2 text-sm text-gray-700 hover:bg-gray-50">
-                  <User size={16} /> Profile
-                </button>
-                <button className="flex w-full items-center gap-2.5 rounded-lg px-3 py-2 text-sm text-gray-700 hover:bg-gray-50">
-                  <SettingsIcon size={16} /> Settings
-                </button> */}
                   <button
                     onClick={() => handleLogout()}
                     className="flex w-full items-center gap-2.5 rounded-lg px-3 py-2 text-sm text-red-500 hover:bg-red-50">
@@ -269,13 +441,23 @@ console.log(reports)
 
             <div className="relative flex items-start justify-between overflow-hidden rounded-2xl
               bg-gradient-to-br from-green-50 to-white p-8">
+
+              <AnimatePresence initial={false}>
+                {isNewAnalysisClicked ?
+                  <AnalysisButton />
+                  : null
+                }
+              </AnimatePresence>
+
               <div className="max-w-md">
                 <h2 className="text-2xl font-bold">Analyze a New Gig</h2>
                 <p className="mt-2 text-gray-500">
                   Get AI-powered insights to improve your gig title,
                   description, tags and more.
                 </p>
-                <button className="mt-5 flex items-center gap-2 rounded-full bg-fiver-green px-6 py-2.5 font-semibold text-white hover:bg-green-700">
+                <button
+                  onClick={() => setIsNewAnalysisClicked(!isNewAnalysisClicked)}
+                  className="mt-5 flex items-center gap-2 rounded-full bg-fiver-green px-6 py-2.5 font-semibold text-white hover:bg-green-700">
                   <Plus size={18} />
                   Start New Analysis
                 </button>
@@ -306,21 +488,21 @@ console.log(reports)
                   <tr key={p[0]} className="border-t border-gray-50">
                     <td className="px-6 py-4">
                       <a href={`/${user.username}/report/${p[0]}`}>
-                       <div className="flex items-center gap-3">
-                        <div
-                          className={`flex h-10 w-10 items-center justify-center rounded-xl font-semibold ${p["color"]} `}
-                        >
-                          {p[1][0]}
+                        <div className="flex items-center gap-3">
+                          <div
+                            className={`flex h-10 w-10 items-center justify-center rounded-xl font-semibold ${p["color"]} `}
+                          >
+                            {p[1][0]}
+                          </div>
+                          <div>
+                            <p className="font-semibold text-gray-800">
+                              {p[1]}
+                            </p>
+                            <p className="text-xs text-gray-400">
+                              {p[3]}
+                            </p>
+                          </div>
                         </div>
-                        <div>
-                           <p className="font-semibold text-gray-800">
-                            {p[1]}
-                          </p>
-                          <p className="text-xs text-gray-400">
-                            {p[3]}
-                          </p>
-                        </div>
-                      </div>
                       </a>
                     </td>
                     <td className=" py-4">

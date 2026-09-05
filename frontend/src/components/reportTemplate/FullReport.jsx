@@ -152,6 +152,7 @@ export default function FullReport({gig_data}) {
   const [openFaq, setOpenFaq] = useState(0);
   const sectionRefs = useRef({});
 
+  console.log("in report")
   useEffect(() => {
     const observer = new IntersectionObserver(
       (entries) => {
@@ -305,7 +306,7 @@ export default function FullReport({gig_data}) {
                   <div className="mt-3 flex items-center gap-1.5">
                     <span className="text-sm font-bold text-slate-800">{s.overall.label}</span>
                   </div>
-                  <span className="text-xs text-emerald-600 font-medium mt-0.5">{s.overall.percentile_note}</span>
+                  <span className="text-xs text-emerald-600 font-medium mt-0.5" style={{width: "300px"}}>{s.overall.percentile_note}</span>
                 </div>
 
                 <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 flex-1">
