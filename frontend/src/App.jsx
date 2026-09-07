@@ -22,10 +22,15 @@ function App() {
         <Routes>         
           {/* Public Routes */}
           <Route path="/" element={<LandingPage />} />
-          <Route path="/dashboarddemo" element={<Dashboard/>} />
-          <Route path="*" element={<NotFound/>}/> 
-          <Route path="l" element={<Loading/>}/>
           <Route path="/huzaifa/report" element={<FullReport gig_data={gig_data.report}/>} />
+          <Route path="*" element={<NotFound/>}/> 
+
+
+          {/* Have to delete below routes */}
+          <Route path="/dashboarddemo" element={<Dashboard/>} /> 
+          <Route path="l" element={<Loading/>}/>
+
+          
           
           {/* Authentication Routes contains Login and Signup pages */}
           <Route path="/auth" element={<AuthRoutes/>}>
@@ -37,7 +42,7 @@ function App() {
           <Route element={<ProtectedRoutes/>}>
             <Route path="/dashboard" element={<Dashboard/>} />
             <Route path="/:username/analyze-report/:content_id" element={<Waiting/>}/>
-            <Route path="/:username/report/:report_id" element={<FullReport gig_data={gig_data.report}/>}/>
+            <Route path="/:username/report/:report_id" element={<ReportManager />}/>
 
             <Route path="/editor" element={<EditorRoutes/>}>
               <Route path="shortreport" element={<ShortReportEditor/>} />

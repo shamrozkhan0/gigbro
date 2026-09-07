@@ -10,6 +10,7 @@ import {
     Clock,
     Code2,
 } from "lucide-react";
+import { Helmet } from "react-helmet-async";
 
 
 const emptyPackage = () => ({ name: "", price: "", description: "" });
@@ -84,6 +85,54 @@ export default function ShortReportEditor() {
 
     return (
         <div style={{ fontFamily: "'Inter', sans-serif" }} className="min-h-screen w-full bg-white text-[#1B1B1F]">
+            <Helmet>
+                <title>
+                    {title
+                        ? `${title} | GigBro Gig Editor`
+                        : "Create & Optimize Your Fiverr Gig | GigBro"}
+                </title>
+
+                <meta
+                    name="description"
+                    content="Create your Fiverr gig and optimize its title, description, category, and search tags with GigBro."
+                />
+
+                <meta
+                    name="robots"
+                    content="noindex, nofollow, noarchive"
+                />
+
+                <meta
+                    property="og:title"
+                    content="Create & Optimize Your Fiverr Gig | GigBro"
+                />
+
+                <meta
+                    property="og:description"
+                    content="Create and optimize your Fiverr gig with GigBro."
+                />
+
+                <meta
+                    property="og:type"
+                    content="website"
+                />
+
+                <meta
+                    name="twitter:card"
+                    content="summary"
+                />
+
+                <meta
+                    name="twitter:title"
+                    content="Create & Optimize Your Fiverr Gig | GigBro"
+                />
+
+                <meta
+                    name="twitter:description"
+                    content="Create and optimize your Fiverr gig with GigBro."
+                />
+            </Helmet>
+
 
             <header className="sticky top-0 z-30 border-b border-[#E5E7EB] bg-white/90 backdrop-blur">
                 <div className="mx-auto flex max-w-[1400px] items-center justify-between px-6 py-4 sm:px-10">

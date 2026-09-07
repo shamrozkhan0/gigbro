@@ -97,7 +97,7 @@ export default function Navbar() {
         <div className="hidden items-center gap-3 lg:flex">
           {!isLogin ?
             <>
-              <Link to="/login" className="rounded-lg border border-slate-200 px-5 py-2 text-[15px] font-medium text-slate-800 transition-colors hover:bg-slate-50">
+              <Link to="/auth/login" className="rounded-lg border border-slate-200 px-5 py-2 text-[15px] font-medium text-slate-800 transition-colors hover:bg-slate-50">
                 Login
               </Link>
               <Link to="/signup" className="flex items-center gap-2 rounded-lg bg-emerald-600 px-5 py-2 text-[15px] font-semibold text-white shadow-sm transition-colors hover:bg-emerald-700">
@@ -153,7 +153,7 @@ export default function Navbar() {
           <div className="mt-3 flex flex-col gap-2 border-t border-slate-100 pt-3">
             {!isLogin ?
               <>
-                <Link to="/login" className="rounded-lg border border-slate-200 px-5 py-2 text-[15px] font-medium text-slate-800 transition-colors hover:bg-slate-50">
+                <Link to="/auth/login" className="rounded-lg border border-slate-200 px-5 py-2 text-[15px] font-medium text-slate-800 transition-colors hover:bg-slate-50">
                   Login
                 </Link>
                 <Link to="/signup" className="flex items-center gap-2 rounded-lg bg-emerald-600 px-5 py-2 text-[15px] font-semibold text-white shadow-sm transition-colors hover:bg-emerald-700">

@@ -1,6 +1,3 @@
-import json
-from email import message
-
 from fastapi import FastAPI, Response, Cookie, HTTPException
 from entity.authentication import LoginUser, SignupUser
 from fastapi.middleware.cors import CORSMiddleware
@@ -13,6 +10,7 @@ from pydantic import BaseModel
 from entity.data import Data
 import logging as log
 import pymysql
+import json
 import os
 
 app = FastAPI()
@@ -89,16 +87,15 @@ class ContentRequest(BaseModel):
 
 @app.get("/analyze/{username}/{content_id}")
 def analyze(username:str, content_id:int, jwt_token=Cookie(...)):
+    print("called")
     isLogin = verify_jwt(jwt_token)
     if not isLogin["success"]:
         return {"success": False, "message": "User is not authorized"}
     request = ContentRequest(username=username, content_id=content_id)
     db = Database()
     content = db.get_content_by_id(request.username, request.content_id)
-    print("jnqrijcoivkowe")
     a = Analyzer(content["message"])
     result = a.get_response()
-    print(result)
     db = Database()
     conn = db._connect_with_database()
     conn.close()
@@ -119,13 +116,84 @@ def get_projects(username: str, jwt_token=Cookie(...)):
     }
 
 
-@app.get("/getreport/{username}/{report_id}")
-def get_report_if_exist(username:str, report_id:int, jwt_token: str = Cookie()):
-    user = verify_jwt(jwt_token)
-
+@app.get("/reportexist/{username}/{report_id}")
+def check_if_report_exists(
+    username: str,
+    report_id: int,
+    jwt_token: str = Cookie()
+):
     try:
+        user = verify_jwt(jwt_token)
+
         if not user["success"]:
-            return user
+            return {
+                "success": False,
+                "message": "Login First"
+            }
+
+        db = Database()
+
+        response = database_utils.get_report_by_id(
+            db._connect_with_database(),
+            db.report_table_name,
+            report_id
+        )
+
+        if not response["success"]:
+            return {
+                "success": True,
+                "exists": False,
+                "message": "Report is not ready yet"
+            }
+
+        report_username = response["username"]
+        print("reportusername",report_username)
+        print("user",user)
+        if username != report_username or username != user["user"]["username"]:
+            log.warning(
+                "Unauthorized report access: username=%s report_id=%s",
+                username,
+                report_id
+            )
+
+            return {
+                "success": False,
+                "message": "You are not the owner of this report"
+            }
+
+        return {
+            "success": True,
+            "exists": True,
+            "message": "Report exists"
+        }
+
+    except Exception:
+        log.exception(
+            "Error checking report existence: report_id=%s",
+            report_id
+        )
+
+        return {
+            "success": False,
+            "message": "Something went wrong"
+        }
+
+
+@app.get("/getreport/{username}/{report_id}")
+def get_report(
+    username: str,
+    report_id: int,
+    jwt_token: str = Cookie()
+):
+    try:
+
+        user = verify_jwt(jwt_token)
+        print(user)
+        if not user["success"]:
+            return {
+                "success": False,
+                "message": "Login First"
+            }
 
         db = Database()
 
@@ -138,30 +206,39 @@ def get_report_if_exist(username:str, report_id:int, jwt_token: str = Cookie()):
         if not response["success"]:
             return response
 
-
         report_username = response["username"]
-        report = response["report"]
 
-        if not (username == report_username) and not (username == user["username"]):
+        if username != report_username or username != user["user"]["username"]:
+            log.warning(
+                "Unauthorized report access: username=%s report_id=%s",
+                report_id,
+                username
+            )
+
             return {
-                "success" : False,
-                "message" : "Your are not the respected owner"
+                "success": False,
+                "message": "You are not the owner of this report"
             }
 
+        report = response["report"]
+
         return {
-            "success" : True,
-            "message" : json.loads(report)
+            "success": True,
+            "message": json.loads(report)
         }
 
-    except Exception as e:
-        return ...
+    except Exception:
+        log.exception(
+            "Error retrieving report: report_id=%s",
+            report_id
+        )
+
+        return {
+            "success": False,
+            "message": "Something went wrong"
+        }
 
 
-
-
-@app.get("/getdasboard/{username}/{id}")
-def getUserDashboard(username:str, id:int, jwt:str = Cookie()):
-    ...
 
 
 

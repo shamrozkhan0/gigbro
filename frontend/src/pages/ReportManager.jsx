@@ -5,66 +5,121 @@ import { useNotification } from "../context/NotificationContext"
 import FullReport from "../components/reportTemplate/FullReport"
 import Waiting from "../components/Waiting"
 
-
 export default function ReportManager() {
   const navigate = useNavigate()
-  const [report, setReport] = useState(null)
+
   const { username, report_id } = useParams()
-  const { showNotification } = useNotification()  
-  const reportVerificationURL = `${import.meta.env.VITE_BACKEND_URL}getreport/${username}/${report_id}`
+
+  const { showNotification } = useNotification()
+
+  const [isReportExist, setIsReportExist] = useState(null)
+  const [report, setReport] = useState(null)
 
   useEffect(() => {
-    async function checkIfReportExists() {
+    async function checkReport() {
       try {
-        console.log("req comes here")
 
-        const response = await fetch(reportVerificationURL, {
-          credentials: "include"
-        })
+        setIsReportExist(null)
+        setReport(null)
 
-        if (!response.ok) {
+        const backendURL = import.meta.env.VITE_BACKEND_URL
+
+
+        const existenceResponse = await fetch(
+          `${backendURL}reportexist/${username}/${report_id}`,
+          {
+            credentials: "include",
+          }
+        )
+
+        if (!existenceResponse.ok) {
           showNotification({
             success: false,
-            message: "Something went wrong"
+            message: "Something went wrong",
           })
-        console.log("response incorrect")
 
-          return navigate("/dashboard")
+          navigate("/dashboard")
+          return
         }
 
-        const data = await response.json()
+        const existenceData = await existenceResponse.json()
 
-        if (!data.success) {
-          console.log("error")
+        console.log("Report existence:", existenceData)
+
+
+        if (!existenceData.success) {
           showNotification({
-            success: data.success,
-            message: data.message
+            success: false,
+            message: existenceData.message,
           })
 
-          return navigate("/dashboard")
+          navigate("/dashboard")
+          return
         }
-        console.log("req comes here2")
 
-        setReport(data.message)
-        console.log("req comes here3")
+        if (!existenceData.exists) {
+          setIsReportExist(false)
+          return
+        }
 
-      } catch (err) {
-        console.log("error")
+        setIsReportExist(true)
 
-        console.log("Error ", err)
+        const reportResponse = await fetch(
+          `${backendURL}getreport/${username}/${report_id}`,
+          {
+            credentials: "include",
+          }
+        )
+
+
+        if (!reportResponse.ok) {
+          showNotification({
+            success: false,
+            message: "Failed to load report",
+          })
+
+          navigate("/dashboard")
+          return
+        }
+
+        const reportData = await reportResponse.json()
+        console.log(reportData)
+
+        if (!reportData.success) {
+          showNotification({
+            success: false,
+            message: reportData.message,
+          })
+
+          navigate("/dashboard")
+          return
+        }
+        
+        setReport(reportData.message)
+
+      } catch (error) {
+        console.error("Report error:", error)
+
+        showNotification({
+          success: false,
+          message: "Something went wrong",
+        })
+
+        navigate("/dashboard")
       }
     }
 
-    checkIfReportExists()
+    checkReport()
   }, [username, report_id])
 
-  return (
-<>
-     {report ? (
-        <FullReport gig_data={report} />
-      ) : (
-        <Waiting/>
-      )}
-  </>
-  )
+
+  if (isReportExist === null) {
+    return <Loading />
+  }
+
+  if (isReportExist === false) {
+    return <Waiting />
+  }
+
+  return report && <FullReport gig_data={report} />
 }

@@ -15,6 +15,7 @@ import {
   Info,
   Lock,
 } from "lucide-react";
+import { Helmet } from "react-helmet-async";
 
 const randomColor = [
   "bg-purple-100 text-purple-600",
@@ -280,6 +281,21 @@ const Dashboard = () => {
 
   return (
     <div className="flex h-screen w-screen bg-gray-50 text-gray-900 ">
+
+        <Helmet>
+        <title>Dashboard | GigBro</title>
+
+        <meta
+          name="description"
+          content="Manage your Fiverr gig reports and track your optimization insights with GigBro."
+        />
+
+        <meta
+          name="robots"
+          content="noindex, nofollow, noarchive"
+        />
+      </Helmet>
+
       {/* Sidebar */}
       <aside className="hidden md:flex justify-between w-64 shrink-0 flex-col border-r border-gray-100 bg-white px-4 py-6">
         <div className="">

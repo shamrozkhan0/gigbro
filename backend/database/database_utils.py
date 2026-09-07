@@ -66,7 +66,10 @@ def get_report_by_id(conn, table, id):
             return {"success": True, "username": data[0], "report": data[1]}
     except pymysql.Error as e:
         log.error(f"| Error: {e}")
-        return None
+        return {
+            "success": False,
+            "message": e
+        }
 
 
     finally:
