@@ -39,7 +39,7 @@ const Signup = () => {
       message: data.message
     })
 
-    if (data.success) navigate("/login");
+    if (data.success) navigate("/auth/login");
 
   };
 

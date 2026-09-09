@@ -156,7 +156,7 @@ export default function Navbar() {
                 <Link to="/auth/login" className="rounded-lg border border-slate-200 px-5 py-2 text-[15px] font-medium text-slate-800 transition-colors hover:bg-slate-50">
                   Login
                 </Link>
-                <Link to="/signup" className="flex items-center gap-2 rounded-lg bg-emerald-600 px-5 py-2 text-[15px] font-semibold text-white shadow-sm transition-colors hover:bg-emerald-700">
+                <Link to="/auth/signup" className="flex items-center gap-2 rounded-lg bg-emerald-600 px-5 py-2 text-[15px] font-semibold text-white shadow-sm transition-colors hover:bg-emerald-700">
                   Analyze My Gig Free
                   <Sparkles className="h-4 w-4" />
                 </Link>
